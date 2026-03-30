@@ -31,6 +31,8 @@ exports.employees_permission = [
   'schedule_create',
   'schedule_read',
   'schedule_update',
+  'schedule_jobs',
+  'schedule_find',
 ];
 
 exports.manager_permission = [
@@ -80,6 +82,8 @@ exports.manager_permission = [
   'schedule_create',
   'schedule_read',
   'schedule_update',
+  'schedule_jobs',
+  'schedule_find',
   'paymentterm_all',
   'clienttype_all',
   'ratesheet_one',
@@ -232,6 +236,8 @@ exports.admin_permission = [
   'schedule_create',
   'schedule_read',
   'schedule_update',
+  'schedule_jobs',
+  'schedule_find',
   'state_create',
   'state_update',
   'state_delete',

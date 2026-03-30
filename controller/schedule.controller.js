@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const { startOfDay, endOfDay } = require('date-fns');
 const logger = require('../middleware/logger');
-const { SCHEDULING_PIPELINE } = require('../middleware/pipelines');
+const { SCHEDULING_PIPELINE, JOB_PIPELINE } = require('../middleware/pipelines');
+const job = require('../models/job');
 const scheduling = require('../models/scheduling');
 
 exports.readSchedule = async (req, res) => {
@@ -11,6 +12,13 @@ exports.readSchedule = async (req, res) => {
     var search = req.query.search ? decodeURIComponent(req.query.search) : '';
     var sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     var user_id = req.query.user_id;
+
+    const sortFieldMap = {
+      task_number: 'task.number_str',
+      job_number: 'job_id.number_str',
+      manager: 'project_managers.first_name',
+    };
+    const sortField = sortFieldMap[req.query.sortField] || 'createdAt';
     var start_date = req.query.startDate ?? null;
     var end_date = req.query.endDate ?? null;
 
@@ -43,7 +51,7 @@ exports.readSchedule = async (req, res) => {
       var allSchedules = await scheduling.aggregate([
         { $match: myMatch },
         ...SCHEDULING_PIPELINE,
-        { $sort: { createdAt: sortOrder } },
+        { $sort: { [sortField]: sortOrder } },
         { $skip: parseInt(skip) },
         { $limit: parseInt(per_page) },
       ]);
@@ -76,7 +84,7 @@ exports.readSchedule = async (req, res) => {
       var allSchedules = await scheduling.aggregate([
         ...SCHEDULING_PIPELINE,
         matchWhere,
-        { $sort: { createdAt: sortOrder } },
+        { $sort: { [sortField]: sortOrder } },
         { $skip: parseInt(skip) },
         { $limit: parseInt(per_page) },
       ]);
@@ -97,36 +105,31 @@ exports.readSchedule = async (req, res) => {
 
 exports.createSchedule = async (req, res) => {
   try {
-    const {
-      task_number,
+    const { task_id, job_id, task_scope_id, cost_item } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(task_id)) {
+      return res.send({ statusCode: 400, message: 'Invalid task_id' });
+    }
+
+    const taskObjectId = mongoose.Types.ObjectId(task_id);
+
+    // Find an existing scheduling record for the same job to reuse
+    // project_managers and select_client_id already stored in correct format
+    const existingSchedule = await scheduling.findOne({
       job_id,
-      client_id,
-      project_managers,
-      task_scope_id,
-      cost_item,
-      group_number,
-      sequence_number,
-      planned_date,
-      assigned_members,
-      estimated_hours,
-      comments,
-      document_link,
-    } = req.body;
+      is_deleted: false,
+    });
+
+    const select_client_id = existingSchedule?.select_client_id ?? null;
+    const project_managers = existingSchedule?.project_managers ?? [];
 
     const newSchedule = await scheduling.create({
-      task_number,
+      task_id: taskObjectId,
       job_id,
-      client_id,
+      select_client_id,
       project_managers,
       task_scope_id,
-      cost_item,
-      group_number,
-      sequence_number,
-      planned_date,
-      assigned_members,
-      estimated_hours,
-      comments,
-      document_link,
+      cost_item: Array.isArray(cost_item) ? cost_item : [cost_item],
     });
 
     logger.accessLog.info('schedule create success');
@@ -162,6 +165,64 @@ exports.readAllSchedule = async (req, res) => {
   } catch (err) {
     logger.errorLog.error('schedule fetch fail');
     res.send({ statusCode: 500, message: 'Schedule Fetch Fail', error: err });
+  }
+};
+
+exports.findSchedule = async (req, res) => {
+  try {
+    const { job_id, task_id, task_scope_id, cost_item } = req.query;
+
+    if (!job_id || !task_id || !task_scope_id || !cost_item) {
+      return res.send({ statusCode: 400, message: 'job_id, task_id, task_scope_id and cost_item are required' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(task_id)) {
+      return res.send({ statusCode: 400, message: 'Invalid task_id' });
+    }
+
+    const match = {
+      job_id,
+      task_id: mongoose.Types.ObjectId(task_id),
+      task_scope_id,
+      cost_item,
+      is_deleted: false,
+    };
+
+    const results = await scheduling.aggregate([
+      { $match: match },
+      ...SCHEDULING_PIPELINE,
+      { $limit: 1 },
+    ]);
+
+    if (!results.length) {
+      return res.send({ statusCode: 404, message: 'No matching schedule found for the selected criteria' });
+    }
+
+    logger.accessLog.info('schedule find success');
+    res.send({ statusCode: 200, message: 'Schedule found', data: results[0] });
+  } catch (err) {
+    logger.errorLog.error('schedule find fail');
+    res.send({ statusCode: 500, message: 'Schedule find fail', error: err });
+  }
+};
+
+exports.readScheduledJobs = async (req, res) => {
+  try {
+    // Get distinct job_id values (number_str strings) from schedulings
+    const jobIds = await scheduling.distinct('job_id', { is_deleted: false });
+
+    // Fetch full job details for those job_ids via JOB_PIPELINE
+    const jobs = await job.aggregate([
+      { $match: { number_str: { $in: jobIds }, is_deleted: false } },
+      ...JOB_PIPELINE,
+      { $sort: { job_number: 1 } },
+    ]);
+
+    logger.accessLog.info('scheduled jobs fetch success');
+    res.send({ statusCode: 200, message: 'Scheduled jobs fetched successfully', data: jobs });
+  } catch (err) {
+    logger.errorLog.error('scheduled jobs fetch fail');
+    res.send({ statusCode: 500, message: 'Scheduled jobs fetch fail', error: err });
   }
 };
 

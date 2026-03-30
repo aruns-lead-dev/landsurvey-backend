@@ -63,6 +63,7 @@ async function migrate() {
           planned_date: '',
           assigned_members: [],
           comments: [],
+          status: 'open',
           estimated_hour:
             '$billing_line_items.labour_item.labour_cost_items.estimated_hour',
           document_link: '',
@@ -101,6 +102,7 @@ async function migrate() {
         cost_item: task.cost_item ? [task.cost_item] : [],
         assigned_members: [],
         comments: [],
+        status: 'open',
         is_deleted: false,
       };
 
