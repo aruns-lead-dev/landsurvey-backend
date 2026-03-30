@@ -5,13 +5,14 @@ const {
   readSchedule,
   createSchedule,
   updateSchedule,
+  readScheduledJobs,
+  findSchedule,
 } = require('../controller/schedule.controller');
 const route = express.Router();
 
 const validation = Joi.object({
-  // task_number: Joi.string().required().label('Task Number'),
-  //job_id: Joi.string().hex().length(24).required().label('Job ID'),
-  //client_id: Joi.string().hex().length(24).required().label('Client ID'),
+  task_id: Joi.string().hex().length(24).optional().label('Task ID'),
+  job_id: Joi.string().optional().allow(null, '').label('Job ID'),
   project_managers: Joi.array()
     .items(Joi.object())
     .optional()
@@ -50,6 +51,8 @@ const scheduleValidation = (req, res, next) => {
 
 route.get('/', readSchedule);
 route.get('/all', readAllSchedule);
+route.get('/jobs', readScheduledJobs);
+route.get('/find', findSchedule);
 route.post('/create', scheduleValidation, createSchedule);
 route.post('/update/:id', scheduleValidation, updateSchedule);
 

@@ -16,6 +16,7 @@ let scheduling = mongoose.Schema(
     },
     select_client_id: {
       type: mongoose.Schema.ObjectId,
+      ref: 'client',
       default: null,
       index: true,
     },
@@ -75,6 +76,12 @@ let scheduling = mongoose.Schema(
     document_link: {
       type: String,
       default: '',
+      index: true,
+    },
+    status: {
+      type: String,
+      enum: ['open', 'assigned', 'completed'],
+      default: 'open',
       index: true,
     },
     is_deleted: {

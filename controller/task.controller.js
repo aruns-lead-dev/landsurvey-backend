@@ -1,4 +1,5 @@
 const { mongoose } = require("mongoose");
+const mongooseLib = require("mongoose");
 const logger = require("../middleware/logger");
 const Jimp = require("jimp");
 const {
@@ -21,6 +22,7 @@ const jobstatus = require("../models/jobstatus");
 const costItem = require("../models/costiteam");
 const office = require("../models/office");
 const dwr = require("../models/dwr");
+const scheduling = require("../models/scheduling");
 
 const { default: axios } = require("axios");
 const { startOfDay, endOfDay } = require("date-fns");
@@ -452,6 +454,8 @@ exports.readAllTask = async (req, res) => {
 };
 
 exports.createTask = async (req, res) => {
+  const session = await mongooseLib.startSession();
+  session.startTransaction();
   try {
     const {
       selectClient,
@@ -508,56 +512,81 @@ exports.createTask = async (req, res) => {
       req.body.attachments = "";
     }
 
-    const newTask = await task.create({
-      attachments: req.body.attachments,
-      client_id: selectClient,
-      select_client_id: selectClient_id,
-      ratesheet_id: selectRatesheet_id,
-      quote_id: selectQuote,
-      company_name: companyName,
-      job_id: selectJob,
-      project_manager: ProjectManager,
-      name: name,
-      description: description,
-      client_location_id: clientLocation,
-      select_client_location_id: clientLocation_id,
-      client_address: clientAddress,
-      office_id: Office,
-      select_office_id: Office_id,
-      task_category_id: TaskCategory,
-      select_task_category_id: TaskCategory_id,
-      task_scope_id: TaskScope,
-      select_task_scope_id: TaskScope_id,
-      gl_code_prefix: glCode,
-      estimate_hour: estimateHour,
-      total_cost_hour: total_cost_hour,
-      billing_line_items: {
-        labour_item: {
-          labour_cost_items: labourItem,
-          additional_fields: additionalLabourItem,
+    const [newTask] = await task.create(
+      [
+        {
+          attachments: req.body.attachments,
+          client_id: selectClient,
+          select_client_id: selectClient_id,
+          ratesheet_id: selectRatesheet_id,
+          quote_id: selectQuote,
+          company_name: companyName,
+          job_id: selectJob,
+          project_manager: ProjectManager,
+          name: name,
+          description: description,
+          client_location_id: clientLocation,
+          select_client_location_id: clientLocation_id,
+          client_address: clientAddress,
+          office_id: Office,
+          select_office_id: Office_id,
+          task_category_id: TaskCategory,
+          select_task_category_id: TaskCategory_id,
+          task_scope_id: TaskScope,
+          select_task_scope_id: TaskScope_id,
+          gl_code_prefix: glCode,
+          estimate_hour: estimateHour,
+          total_cost_hour: total_cost_hour,
+          billing_line_items: {
+            labour_item: {
+              labour_cost_items: labourItem,
+              additional_fields: additionalLabourItem,
+            },
+            equipment_item: {
+              equipment_cost_items: materialItem,
+              additional_fields: additionalEquipmentItem,
+            },
+            fixed_item: fixItem,
+          },
+          status: Status,
+          status_id: Status_id,
+          remark: remark,
+          active: active,
         },
-        equipment_item: {
-          equipment_cost_items: materialItem,
-          additional_fields: additionalEquipmentItem,
-        },
-        fixed_item: fixItem,
-      },
-      status: Status,
-      status_id: Status_id,
-      remark: remark,
-      active: active,
-    });
+      ],
+      { session }
+    );
     if (newTask) {
       if (req.body.selectQuote_id || req.body.selectQuote_id !== "") {
-        await quote.findByIdAndUpdate(req.body.selectQuote_id, {
-          $set: { is_converted: 1 },
-        });
+        await quote.findByIdAndUpdate(
+          req.body.selectQuote_id,
+          { $set: { is_converted: 1 } },
+          { session }
+        );
       }
-      await task.findByIdAndUpdate(newTask._id, {
-        $set: { number_str: newTask.number.toString().padStart(6, "0") },
-      });
+      await task.findByIdAndUpdate(
+        newTask._id,
+        { $set: { number_str: newTask.number.toString().padStart(6, "0") } },
+        { session }
+      );
 
-      await newTask.save();
+      await scheduling.create(
+        [
+          {
+            task_id: newTask._id,
+            job_id: selectJob,
+            select_client_id: selectClient_id,
+            project_managers: ProjectManager
+              ? [{ manager: ProjectManager }]
+              : [],
+          },
+        ],
+        { session }
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+
       logger.accessLog.info("task create success");
       res.send({
         statusCode: 200,
@@ -566,6 +595,8 @@ exports.createTask = async (req, res) => {
       });
     }
   } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
     logger.errorLog.error("task create fail");
     res.send({
       statusCode: 500,

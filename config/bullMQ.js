@@ -1,6 +1,7 @@
 const { Worker, Queue } = require('bullmq');
 const { createAccountWorker } = require('../workers/createAccount.worker');
 const { forgotPasswordWorker } = require('../workers/forgotPassword.worker');
+const { schedulingStatusWorker } = require('../workers/schedulingStatus.worker');
 
 require('dotenv').config();
 
@@ -26,6 +27,10 @@ exports.setupBullMQProcessor = async (queueName) => {
 
         case 'Create Account':
           createAccountWorker(job);
+          break;
+
+        case 'Scheduling Status':
+          await schedulingStatusWorker(job);
           break;
 
         default:

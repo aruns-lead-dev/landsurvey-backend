@@ -9,7 +9,7 @@ let task = mongoose.Schema(
       index: true,
     },
     client_id: {
-      type: mongoose.Schema.ObjectId,
+      type: String,
       default: null,
       index: true,
     },
