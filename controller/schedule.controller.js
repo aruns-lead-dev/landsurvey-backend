@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 const { startOfDay, endOfDay } = require('date-fns');
 const logger = require('../middleware/logger');
-const { SCHEDULING_PIPELINE, JOB_PIPELINE } = require('../middleware/pipelines');
+const {
+  SCHEDULING_PIPELINE,
+  JOB_PIPELINE,
+} = require('../middleware/pipelines');
 const job = require('../models/job');
 const scheduling = require('../models/scheduling');
 
@@ -30,7 +33,7 @@ exports.readSchedule = async (req, res) => {
     }
     const skip = page * per_page - per_page;
 
-    var myMatch = { is_deleted: false };
+    var myMatch = { is_deleted: false, status: { $in: ['open', 'assigned'] } };
 
     if (
       user_id &&
@@ -105,7 +108,8 @@ exports.readSchedule = async (req, res) => {
 
 exports.createSchedule = async (req, res) => {
   try {
-    const { task_id, job_id, task_scope_id, cost_item } = req.body;
+    const { task_id, job_id, task_scope_id, cost_item, estimated_hours } =
+      req.body;
 
     if (!mongoose.Types.ObjectId.isValid(task_id)) {
       return res.send({ statusCode: 400, message: 'Invalid task_id' });
@@ -130,6 +134,9 @@ exports.createSchedule = async (req, res) => {
       project_managers,
       task_scope_id,
       cost_item: Array.isArray(cost_item) ? cost_item : [cost_item],
+      ...(estimated_hours != null && {
+        estimated_hours: parseFloat(estimated_hours),
+      }),
     });
 
     logger.accessLog.info('schedule create success');
@@ -151,7 +158,7 @@ exports.createSchedule = async (req, res) => {
 exports.readAllSchedule = async (req, res) => {
   try {
     const data = await scheduling.aggregate([
-      { $match: { is_deleted: false } },
+      { $match: { is_deleted: false, status: { $in: ['open', 'assigned'] } } },
       ...SCHEDULING_PIPELINE,
       { $sort: { createdAt: -1 } },
     ]);
@@ -173,7 +180,10 @@ exports.findSchedule = async (req, res) => {
     const { job_id, task_id, task_scope_id, cost_item } = req.query;
 
     if (!job_id || !task_id || !task_scope_id || !cost_item) {
-      return res.send({ statusCode: 400, message: 'job_id, task_id, task_scope_id and cost_item are required' });
+      return res.send({
+        statusCode: 400,
+        message: 'job_id, task_id, task_scope_id and cost_item are required',
+      });
     }
 
     if (!mongoose.Types.ObjectId.isValid(task_id)) {
@@ -195,7 +205,10 @@ exports.findSchedule = async (req, res) => {
     ]);
 
     if (!results.length) {
-      return res.send({ statusCode: 404, message: 'No matching schedule found for the selected criteria' });
+      return res.send({
+        statusCode: 404,
+        message: 'No matching schedule found for the selected criteria',
+      });
     }
 
     logger.accessLog.info('schedule find success');
@@ -219,10 +232,18 @@ exports.readScheduledJobs = async (req, res) => {
     ]);
 
     logger.accessLog.info('scheduled jobs fetch success');
-    res.send({ statusCode: 200, message: 'Scheduled jobs fetched successfully', data: jobs });
+    res.send({
+      statusCode: 200,
+      message: 'Scheduled jobs fetched successfully',
+      data: jobs,
+    });
   } catch (err) {
     logger.errorLog.error('scheduled jobs fetch fail');
-    res.send({ statusCode: 500, message: 'Scheduled jobs fetch fail', error: err });
+    res.send({
+      statusCode: 500,
+      message: 'Scheduled jobs fetch fail',
+      error: err,
+    });
   }
 };
 
