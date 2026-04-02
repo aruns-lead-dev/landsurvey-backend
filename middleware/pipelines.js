@@ -592,6 +592,7 @@ exports.SCHEDULING_PIPELINE = [
       assigned_members: 1,
       comments: 1,
       document_link: 1,
+      status: 1,
       createdAt: { $dateToString: { format: '%d-%m-%Y', date: '$createdAt' } },
       updatedAt: { $dateToString: { format: '%d-%m-%Y', date: '$updatedAt' } },
     },
