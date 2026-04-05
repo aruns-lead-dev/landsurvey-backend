@@ -33,7 +33,7 @@ exports.readSchedule = async (req, res) => {
     }
     const skip = page * per_page - per_page;
 
-    var myMatch = { is_deleted: false, status: { $in: ['open', 'assigned'] } };
+    var myMatch = { is_deleted: false };
 
     if (
       user_id &&
@@ -177,12 +177,12 @@ exports.readAllSchedule = async (req, res) => {
 
 exports.findSchedule = async (req, res) => {
   try {
-    const { job_id, task_id, task_scope_id, cost_item } = req.query;
+    const { job_id, task_id, task_scope_id } = req.query;
 
-    if (!job_id || !task_id || !task_scope_id || !cost_item) {
+    if (!job_id || !task_id || !task_scope_id) {
       return res.send({
         statusCode: 400,
-        message: 'job_id, task_id, task_scope_id and cost_item are required',
+        message: 'job_id, task_id and task_scope_id are required',
       });
     }
 
@@ -194,7 +194,6 @@ exports.findSchedule = async (req, res) => {
       job_id,
       task_id: mongoose.Types.ObjectId(task_id),
       task_scope_id,
-      cost_item,
       is_deleted: false,
     };
 

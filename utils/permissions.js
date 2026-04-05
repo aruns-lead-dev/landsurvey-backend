@@ -33,6 +33,7 @@ exports.employees_permission = [
   'schedule_update',
   'schedule_jobs',
   'schedule_find',
+  'holyday_read',
 ];
 
 exports.manager_permission = [
@@ -84,6 +85,7 @@ exports.manager_permission = [
   'schedule_update',
   'schedule_jobs',
   'schedule_find',
+  'holyday_read',
   'paymentterm_all',
   'clienttype_all',
   'ratesheet_one',
@@ -238,6 +240,10 @@ exports.admin_permission = [
   'schedule_update',
   'schedule_jobs',
   'schedule_find',
+  'holyday_read',
+  'holyday_create',
+  'holyday_update',
+  'holyday_delete',
   'state_create',
   'state_update',
   'state_delete',
