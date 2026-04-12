@@ -51,13 +51,13 @@ exports.readState = async (req, res) => {
     logger.accessLog.info("state fetch fail");
     res.send({
       statusCode: 200,
-      massage: "state fetch successfully",
+      message: "state fetch successfully",
       total: totalDataCount,
       statedata: allUsers,
     });
   } catch (err) {
     logger.errorLog.error("state fetch fail");
-    res.send({ statusCode: 500, massage: "state fetch fail", error: err });
+    res.send({ statusCode: 500, message: "state fetch fail", error: err });
   }
 };
 
@@ -71,12 +71,12 @@ exports.readAllState = async (req, res) => {
     logger.accessLog.info("state fetch success");
     res.send({
       statusCode: 200,
-      massage: "state fetch successfully",
+      message: "state fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("state fetch fail");
-    res.send({ statusCode: 500, massage: "state fetch fail", error: err });
+    res.send({ statusCode: 500, message: "state fetch fail", error: err });
   }
 };
 
@@ -90,12 +90,12 @@ exports.readStateById = async (req, res) => {
     logger.accessLog.info("state fetch success");
     res.send({
       statusCode: 200,
-      massage: "state fetch successfully",
+      message: "state fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("state fetch fail");
-    res.send({ statusCode: 500, massage: "state fetch fail", error: err });
+    res.send({ statusCode: 500, message: "state fetch fail", error: err });
   }
 };
 
@@ -109,7 +109,7 @@ exports.createState = async (req, res, next) => {
       await newState.save();
       logger.accessLog.info("state create success");
       return sendSuccessResponse(res, {
-        massage: "The state has been created successfully",
+        message: "The state has been created successfully",
         state: newState,
       });
     }
@@ -119,7 +119,7 @@ exports.createState = async (req, res, next) => {
     );
     res.send({
       status: 400,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
     });
   }
 };
@@ -134,7 +134,7 @@ exports.updateState = async (req, res, next) => {
       logger.accessLog.info("state update fail");
       res.send({
         statusCode: 200,
-        massage: "The state has been updated successfully",
+        message: "The state has been updated successfully",
         state: updateState,
       });
     }
@@ -142,7 +142,7 @@ exports.updateState = async (req, res, next) => {
     logger.errorLog.error("state update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -157,14 +157,14 @@ exports.deleteState = async (req, res) => {
     logger.accessLog.info("state delete fail");
     res.send({
       statusCode: 200,
-      massage: "The state has been deleted successfully",
+      message: "The state has been deleted successfully",
       state: deleteState,
     });
   } catch (err) {
     logger.errorLog.error("state delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

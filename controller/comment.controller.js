@@ -117,11 +117,11 @@ exports.readAllComment = async (req, res) => {
     logger.accessLog.info('comment fetch success');
     res.send({
       statusCode: 200,
-      massage: 'Comment Fetch Successfully',
+      message: 'Comment Fetch Successfully',
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error('comment fetch fail');
-    res.send({ statusCode: 500, massage: 'Comment Fetch Fail', error: err });
+    res.send({ statusCode: 500, message: 'Comment Fetch Fail', error: err });
   }
 };

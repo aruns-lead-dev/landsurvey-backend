@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const { readHolydays, createHolyday, updateHolyday, deleteHolyday } = require('../controller/holyday.controller');
+const { readHolidays, createHoliday, updateHoliday, deleteHoliday } = require('../controller/holiday.controller');
 
 const route = express.Router();
 
@@ -9,7 +9,7 @@ const validation = Joi.object({
   description: Joi.string().trim().required().label('Description'),
 });
 
-const holydayValidation = (req, res, next) => {
+const holidayValidation = (req, res, next) => {
   const { error } = validation.validate({ date: req.body.date, description: req.body.description }, {
     errors: { label: 'key', wrap: { label: false } },
   });
@@ -17,9 +17,9 @@ const holydayValidation = (req, res, next) => {
   next();
 };
 
-route.get('/', readHolydays);
-route.post('/create', holydayValidation, createHolyday);
-route.post('/update/:id', holydayValidation, updateHolyday);
-route.post('/delete/:id', deleteHolyday);
+route.get('/', readHolidays);
+route.post('/create', holidayValidation, createHoliday);
+route.post('/update/:id', holidayValidation, updateHoliday);
+route.post('/delete/:id', deleteHoliday);
 
 module.exports = route;

@@ -9,7 +9,7 @@ module.exports = {
       jwt.sign(userData, process.env.JWT_SECRET_KEY, options, async (err, token) => {
         const fetchUser = await user.findOne(userData)
         if (err) reject(err);
-        resolve({ statusCode: 200, massage: "LoggedIn Successfully", token: token, user: fetchUser });
+        resolve({ statusCode: 200, message: "LoggedIn Successfully", token: token, user: fetchUser });
       });
     });
   },
@@ -26,12 +26,12 @@ module.exports = {
     }
 
     if (!req.headers["authorization"])
-      return res.json({ massage: "Access Denied" });
+      return res.json({ message: "Access Denied" });
     const authHeader = req.headers["authorization"];
     const bearerToken = authHeader.split(" ");
     const token = bearerToken[1];
     if (token === "null") {
-      res.json({ massage: "Access Denied" })
+      res.json({ message: "Access Denied" })
     }
 
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
@@ -41,7 +41,7 @@ module.exports = {
       }
       else {
         const userPermissions = fetchUser?.permission;
-        if (err) return res.json({ massage: err });
+        if (err) return res.json({ message: err });
         if (userPermissions?.includes(permission)) {
           next();
         }

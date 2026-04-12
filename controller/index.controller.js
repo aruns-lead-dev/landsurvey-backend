@@ -103,9 +103,9 @@ exports.DBEmpty = async (req, res) => {
     await tax.deleteMany({});
     await office.deleteMany({});
     await vehicle.deleteMany({});
-    res.send({ statusCode: 200, massage: "Successfully Deleted Data" });
+    res.send({ statusCode: 200, message: "Successfully Deleted Data" });
   } catch (error) {
-    res.send({ statusCode: 400, massage: "Error While Deleting Data" });
+    res.send({ statusCode: 400, message: "Error While Deleting Data" });
   }
 };
 
@@ -114,7 +114,7 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     const userData = await user.findOne({ email: email });
     if (!userData) {
-      res.send({ statusCode: 404, massage: "User Not Found" });
+      res.send({ statusCode: 404, message: "User Not Found" });
     } else {
       bcrypt.compare(password, userData.password, async function (err, result) {
         if (result) {
@@ -128,7 +128,7 @@ exports.login = async (req, res) => {
           logger.accessLog.info("login successfully");
           res.send({
             statusCode: 400,
-            massage: "Invalid Cradentials Check Again",
+            message: "Invalid Cradentials Check Again",
           });
         }
       });
@@ -137,7 +137,7 @@ exports.login = async (req, res) => {
     logger.errorLog.error("login fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -152,7 +152,7 @@ exports.forgotPassword = async (req, res) => {
     if (!isUser) {
       return res
         .status(404)
-        .json({ statusCode: 404, massage: "No such user found" });
+        .json({ statusCode: 404, message: "No such user found" });
     }
 
     console.log(`${isUser.first_name} ${isUser.last_name} <${isUser.email}>`);
@@ -177,7 +177,7 @@ exports.forgotPassword = async (req, res) => {
         console.error("Error rendering EJS template:", err);
         return res
           .status(500)
-          .json({ statusCode: 500, massage: `Error: ${err.message}` });
+          .json({ statusCode: 500, message: `Error: ${err.message}` });
       }
 
       // Email details
@@ -194,21 +194,21 @@ exports.forgotPassword = async (req, res) => {
         console.log("Email sent:", info);
         return res.status(200).json({
           statusCode: 200,
-          massage: `Reset link sent to ${isUser.email} successfully`,
+          message: `Reset link sent to ${isUser.email} successfully`,
           resetLink,
         });
       } catch (emailError) {
         console.error("Error sending email:", emailError);
         return res
           .status(500)
-          .json({ statusCode: 500, massage: `Error: ${emailError.message}` });
+          .json({ statusCode: 500, message: `Error: ${emailError.message}` });
       }
     });
   } catch (error) {
     console.error("Error in forgotPassword function:", error);
     return res.status(500).json({
       statusCode: 500,
-      massage: "An unexpected error occurred. Please try again later.",
+      message: "An unexpected error occurred. Please try again later.",
       error: error.message,
     });
   }
@@ -235,7 +235,7 @@ exports.changePasswordFromForgot = async (req, res) => {
                 logger.accessLog.info("Password Chnage successfull");
                 res.send({
                   statusCode: 200,
-                  massage: "Password Chnaged Successfully",
+                  message: "Password Chnaged Successfully",
                   user: newUser,
                 });
               }
@@ -250,14 +250,14 @@ exports.changePasswordFromForgot = async (req, res) => {
     } else {
       res.send({
         statusCode: 500,
-        massage: "Reset link was expired try again and get new link",
+        message: "Reset link was expired try again and get new link",
       });
     }
   } catch (err) {
     logger.errorLog.error("Password Chnage fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -519,7 +519,7 @@ exports.createClientSyncQb = async (req, res) => {
         ) {
           return res.send({
             statusCode: 500,
-            massage:
+            message:
               `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
               "Oops Something went wrong. Please contact the administrator",
           });

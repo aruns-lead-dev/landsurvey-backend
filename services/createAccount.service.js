@@ -14,7 +14,7 @@ exports.createAccountService = (req, res) => {
 
     res.json({
         statusCode: 200,
-        massage: "Create Account Job Added Successfully",
+        message: "Create Account Job Added Successfully",
     });
 }
 

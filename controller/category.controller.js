@@ -15,10 +15,10 @@ exports.readCategory = async (req, res) => {
         const totalDataCount = await category.countDocuments({ role: { $in: ["employee", "manager"] } })
         const allUsers = await category.find({}).skip(data).limit(per_page)
         logger.accessLog.info("category fetch fail")
-        res.send({ statusCode: 200, massage: "category fetch successfully", total: totalDataCount, data: allUsers })
+        res.send({ statusCode: 200, message: "category fetch successfully", total: totalDataCount, data: allUsers })
     }
     catch (err) {
         logger.errorLog.error("user fetch fail")
-        res.send({ statusCode: 500, massage: "user fetch fail", error: err })
+        res.send({ statusCode: 500, message: "user fetch fail", error: err })
     }
 }

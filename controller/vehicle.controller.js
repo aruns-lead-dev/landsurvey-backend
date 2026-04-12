@@ -54,13 +54,13 @@ exports.readVehicle = async (req, res) => {
     logger.accessLog.info("vehicle fetch fail");
     res.send({
       statusCode: 200,
-      massage: "vehicle fetch Successfully",
+      message: "vehicle fetch Successfully",
       total: totalDataCount,
       data: allUsers,
     });
   } catch (err) {
     logger.errorLog.error("vehicle fetch fail");
-    res.send({ statusCode: 500, massage: "vehicle fetch fail", error: err });
+    res.send({ statusCode: 500, message: "vehicle fetch fail", error: err });
   }
 };
 
@@ -70,12 +70,12 @@ exports.readAllVehicle = async (req, res) => {
     logger.accessLog.info("vehicle fetch success");
     res.send({
       statusCode: 200,
-      massage: "vehicle fetch successfully",
+      message: "vehicle fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("vehicle fetch fail");
-    res.send({ statusCode: 500, massage: "vehicle fetch fail", error: err });
+    res.send({ statusCode: 500, message: "vehicle fetch fail", error: err });
   }
 };
 
@@ -86,12 +86,12 @@ exports.readVehicleById = async (req, res) => {
     logger.accessLog.info("vehicle fetch success");
     res.send({
       statusCode: 200,
-      massage: "vehicle fetch successfully",
+      message: "vehicle fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("vehicle fetch fail");
-    res.send({ statusCode: 500, massage: "vehicle fetch fail", error: err });
+    res.send({ statusCode: 500, message: "vehicle fetch fail", error: err });
   }
 };
 
@@ -103,7 +103,7 @@ exports.createVehicle = async (req, res) => {
       logger.accessLog.info("vehicle create successfully");
       res.send({
         statusCode: 200,
-        massage: "The vehicle has been created successfully",
+        message: "The vehicle has been created successfully",
         vehicle: newVehicle,
       });
     }
@@ -111,7 +111,7 @@ exports.createVehicle = async (req, res) => {
     logger.errorLog.error("vehicle create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -126,7 +126,7 @@ exports.updateVehicle = async (req, res) => {
       logger.accessLog.info("vehicle update successfully");
       res.send({
         statusCode: 200,
-        massage: "The vehicle has been updated successfully",
+        message: "The vehicle has been updated successfully",
         vehicle: updateVehicle,
       });
     }
@@ -134,7 +134,7 @@ exports.updateVehicle = async (req, res) => {
     logger.errorLog.error("vehicle update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -149,14 +149,14 @@ exports.deleteVehicle = async (req, res) => {
     logger.accessLog.info("vehicle delete successfully");
     res.send({
       statusCode: 200,
-      massage: "The vehicle has been deleted successfully",
+      message: "The vehicle has been deleted successfully",
       vehicle: deleteVehicle,
     });
   } catch (err) {
     logger.errorLog.error("vehicle delete fail");
     res.send({
       statusCode: 500,
-      massage:
+      message:
         "Oops Something went wrong. Please contact the administratorfail",
       error: err,
     });

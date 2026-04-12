@@ -41,11 +41,11 @@ exports.readPaymentterm = async (req, res) => {
 
         }
         logger.accessLog.info("paymentterms fetch fail")
-        res.send({ statusCode: 200, massage: "paymentterms fetch successfully", total: totalDataCount, data: allUsers })
+        res.send({ statusCode: 200, message: "paymentterms fetch successfully", total: totalDataCount, data: allUsers })
     }
     catch (err) {
         logger.errorLog.error("paymentterms fetch fail")
-        res.send({ statusCode: 500, massage: "paymentterms fetch fail", error: err })
+        res.send({ statusCode: 500, message: "paymentterms fetch fail", error: err })
     }
 }
 
@@ -53,11 +53,11 @@ exports.readAllPaymentterm = async (req, res) => {
     try {
         const userData = await paymentterm.find({ is_deleted: false }).sort({ createdAt: -1 })
         logger.accessLog.info("paymentterm fetch success")
-        res.send({ statusCode: 200, massage: "paymentterm fetch successfully", data: userData })
+        res.send({ statusCode: 200, message: "paymentterm fetch successfully", data: userData })
     }
     catch (err) {
         logger.errorLog.error("paymentterm fetch fail")
-        res.send({ statusCode: 500, massage: "paymentterm fetch fail", error: err })
+        res.send({ statusCode: 500, message: "paymentterm fetch fail", error: err })
     }
 }
 
@@ -67,11 +67,11 @@ exports.readPaymenttermById = async (req, res) => {
         const { id } = req.params
         const userData = await paymentterm.findOne({ _id: id, is_deleted: false })
         logger.accessLog.info("paymentterm fetch success")
-        res.send({ statusCode: 200, massage: "paymentterm fetch successfully", data: userData })
+        res.send({ statusCode: 200, message: "paymentterm fetch successfully", data: userData })
     }
     catch (err) {
         logger.errorLog.error("paymentterm fetch fail")
-        res.send({ statusCode: 500, massage: "paymentterm fetch fail", error: err })
+        res.send({ statusCode: 500, message: "paymentterm fetch fail", error: err })
     }
 }
 
@@ -83,12 +83,12 @@ exports.createPaymentterm = async (req, res) => {
         if (newPaymentterm) {
             await newPaymentterm.save()
             logger.accessLog.info("paymentterm create successfully")
-            res.send({ statusCode: 200, massage: "The payment term has been created successfully", paymentterm: newPaymentterm })
+            res.send({ statusCode: 200, message: "The payment term has been created successfully", paymentterm: newPaymentterm })
         }
     }
     catch (err) {
         logger.errorLog.error("paymentterm create fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }
 
@@ -101,13 +101,13 @@ exports.updatePaymentterm = async (req, res) => {
         if (updatePaymentterm) {
             await updatePaymentterm.save()
             logger.accessLog.info("paymentterm update successfully")
-            res.send({ statusCode: 200, massage: "The payment term has been updated successfully", paymentterm: updatePaymentterm })
+            res.send({ statusCode: 200, message: "The payment term has been updated successfully", paymentterm: updatePaymentterm })
         }
     }
     catch (err) {
         Ratesheet
         logger.errorLog.error("paymentterm update fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }
 
@@ -118,10 +118,10 @@ exports.deletePaymentterm = async (req, res) => {
         const { id } = req.params
         const deletePaymentterm = await paymentterm.findByIdAndUpdate(id, { $set: { is_deleted: true } })
         logger.accessLog.info("paymentterm delete successfully")
-        res.send({ statusCode: 200, massage: "The payment term has been deleted successfully", paymentterm: deletePaymentterm })
+        res.send({ statusCode: 200, message: "The payment term has been deleted successfully", paymentterm: deletePaymentterm })
     }
     catch (err) {
         logger.errorLog.error("paymentterm delete fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }

@@ -45,7 +45,7 @@ exports.readJobCategory = async (req, res) => {
     logger.accessLog.info("jobcategory fetch fail");
     res.send({
       statusCode: 200,
-      massage: "jobcategory fetch successfully",
+      message: "jobcategory fetch successfully",
       total: totalDataCount,
       data: allUsers,
     });
@@ -53,7 +53,7 @@ exports.readJobCategory = async (req, res) => {
     logger.errorLog.error("jobcategory fetch fail");
     res.send({
       statusCode: 500,
-      massage: "jobcategory fetch fail",
+      message: "jobcategory fetch fail",
       error: err,
     });
   }
@@ -65,14 +65,14 @@ exports.readAllJobCategory = async (req, res) => {
     logger.accessLog.info("jobcategory fetch success");
     res.send({
       statusCode: 200,
-      massage: "jobcategory fetch successfully",
+      message: "jobcategory fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("jobcategory fetch fail");
     res.send({
       statusCode: 500,
-      massage: "jobcategory fetch fail",
+      message: "jobcategory fetch fail",
       error: err,
     });
   }
@@ -84,14 +84,14 @@ exports.readJobCategoryById = async (req, res) => {
     logger.accessLog.info("jobcategory fetch success");
     res.send({
       statusCode: 200,
-      massage: "jobcategory fetch successfully",
+      message: "jobcategory fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("jobcategory fetch fail");
     res.send({
       statusCode: 500,
-      massage: "jobcategory fetch fail",
+      message: "jobcategory fetch fail",
       error: err,
     });
   }
@@ -105,7 +105,7 @@ exports.createJobCategory = async (req, res) => {
       logger.accessLog.info("jobcategory create fail");
       res.send({
         statusCode: 200,
-        massage: "The job category has been created successfully",
+        message: "The job category has been created successfully",
         jobcategory: newJobCategory,
       });
     }
@@ -113,7 +113,7 @@ exports.createJobCategory = async (req, res) => {
     logger.errorLog.error("jobcategory create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -128,7 +128,7 @@ exports.updateJobCategory = async (req, res) => {
       logger.accessLog.info("jobcategory update successfully");
       res.send({
         statusCode: 200,
-        massage: "The job category has been updated successfully",
+        message: "The job category has been updated successfully",
         jobcategory: updateJobCategory,
       });
     }
@@ -136,7 +136,7 @@ exports.updateJobCategory = async (req, res) => {
     logger.errorLog.error("jobcategory update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -151,14 +151,14 @@ exports.deleteJobCategory = async (req, res) => {
     logger.accessLog.info("jobcategory delete successfully");
     res.send({
       statusCode: 200,
-      massage: "The job category has been deleted successfully",
+      message: "The job category has been deleted successfully",
       jobcategory: deleteJobCategory,
     });
   } catch (err) {
     logger.errorLog.error("jobcategory delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

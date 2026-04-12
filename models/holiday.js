@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const holydaySchema = mongoose.Schema(
+const holidaySchema = mongoose.Schema(
   {
     date: {
       type: Date,
@@ -18,7 +18,7 @@ const holydaySchema = mongoose.Schema(
       index: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-module.exports = mongoose.model('holyday', holydaySchema);
+module.exports = mongoose.model('holiday', holidaySchema, 'holidays');

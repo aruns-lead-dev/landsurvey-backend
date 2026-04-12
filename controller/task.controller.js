@@ -74,7 +74,7 @@ exports.TaskInitalData = async (req, res) => {
     logger.accessLog.info("task inital data fetch success");
     res.send({
       statusCode: 200,
-      massage: "The task initial data has been fetched successfully",
+      message: "The task initial data has been fetched successfully",
       data: {
         client: clientData,
         job: [],
@@ -95,7 +95,7 @@ exports.TaskInitalData = async (req, res) => {
     logger.errorLog.error("task inital data fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the task initial data",
+      message: "Failed to fetch the task initial data",
       error: err,
     });
   }
@@ -129,14 +129,14 @@ exports.readTaskById = async (req, res) => {
     logger.accessLog.info("task fetch success");
     res.send({
       statusCode: 200,
-      massage: "The task has been fetched successfully",
+      message: "The task has been fetched successfully",
       data: taskData,
     });
   } catch (err) {
     logger.errorLog.error("task fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the task",
+      message: "Failed to fetch the task",
       error: err,
     });
   }
@@ -310,7 +310,7 @@ exports.readTask = async (req, res) => {
     logger.accessLog.info("task fetch success");
     res.send({
       statusCode: 200,
-      massage: "The task has been fetched successfully",
+      message: "The task has been fetched successfully",
       total: totalDataCount,
       data: allTasks,
     });
@@ -318,7 +318,7 @@ exports.readTask = async (req, res) => {
     logger.errorLog.error("task fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the task",
+      message: "Failed to fetch the task",
       error: err,
     });
   }
@@ -412,7 +412,7 @@ exports.totalEstimatedBillableCost = async (req, res) => {
     });
     res.send({
       statusCode: 200,
-      massage: "Total Cost has been fetched successfully",
+      message: "Total Cost has been fetched successfully",
       totalBillableCost: totalBillableCost,
       totalEstimatedCost: totalEstimatedCost,
       totalDataCount: totalDataCount,
@@ -421,7 +421,7 @@ exports.totalEstimatedBillableCost = async (req, res) => {
     logger.errorLog.error("task fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the total cost",
+      message: "Failed to fetch the total cost",
       error: error,
     });
   }
@@ -439,7 +439,7 @@ exports.readAllTask = async (req, res) => {
     logger.accessLog.info("task fetch success");
     res.send({
       statusCode: 200,
-      massage: "The task has been fetched successfully",
+      message: "The task has been fetched successfully",
       data: userData,
       updatedwrData: updatedwrData,
     });
@@ -447,7 +447,7 @@ exports.readAllTask = async (req, res) => {
     logger.errorLog.error("task fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the task",
+      message: "Failed to fetch the task",
       error: err,
     });
   }
@@ -590,7 +590,7 @@ exports.createTask = async (req, res) => {
       logger.accessLog.info("task create success");
       res.send({
         statusCode: 200,
-        massage: "The task has been created successfully",
+        message: "The task has been created successfully",
         task: newTask,
       });
     }
@@ -600,7 +600,7 @@ exports.createTask = async (req, res) => {
     logger.errorLog.error("task create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -713,7 +713,7 @@ exports.updateTask = async (req, res) => {
       logger.accessLog.info("task update success");
       res.send({
         statusCode: 200,
-        massage: "The task has been updated successfully",
+        message: "The task has been updated successfully",
         task: updateTaskData,
       });
     }
@@ -721,7 +721,7 @@ exports.updateTask = async (req, res) => {
     logger.errorLog.error("task update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -748,14 +748,14 @@ exports.updateTaskStatus = async (req, res) => {
       logger.accessLog.info("Task status updated Successfully");
       res.send({
         statusCode: 200,
-        massage: "The task has been updated successfully",
+        message: "The task has been updated successfully",
       });
     }
   } catch (err) {
     logger.errorLog.error("Task status update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -795,14 +795,14 @@ exports.deleteTask = async (req, res) => {
     logger.accessLog.info("task delete success");
     res.send({
       statusCode: 200,
-      massage: "The task has been deleted successfully",
+      message: "The task has been deleted successfully",
       task: deleteTaskData,
     });
   } catch (err) {
     logger.errorLog.error("task delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -829,14 +829,14 @@ exports.TaskSearch = async (req, res) => {
 
     res.send({
       statusCode: 200,
-      massage: "The task has been fetched successfully",
+      message: "The task has been fetched successfully",
       data: allTasks,
     });
   } catch (err) {
     logger.errorLog.error("task fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the task",
+      message: "Failed to fetch the task",
       error: err,
     });
   }
@@ -927,7 +927,7 @@ exports.updateTaskEstimatedHours = async (req, res) => {
           logger.accessLog.info("task update success");
           return res.send({
             statusCode: 200,
-            massage: "The task has been updated successfully",
+            message: "The task has been updated successfully",
             task: updateTaskData,
           });
         }
@@ -935,20 +935,20 @@ exports.updateTaskEstimatedHours = async (req, res) => {
 
       return res.send({
         statusCode: 200,
-        massage: "The task has been updated successfully",
+        message: "The task has been updated successfully",
         task: [],
       });
     }
     return res.send({
       statusCode: 200,
-      massage: "The task has been updated successfully",
+      message: "The task has been updated successfully",
       task: [],
     });
   } catch (err) {
     logger.errorLog.error("task update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

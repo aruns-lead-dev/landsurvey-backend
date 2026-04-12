@@ -44,13 +44,13 @@ exports.readFee = async (req, res) => {
     logger.accessLog.info("fee fetch fail");
     res.send({
       statusCode: 200,
-      massage: "fee fetch successfully",
+      message: "fee fetch successfully",
       total: totalDataCount,
       data: allUsers,
     });
   } catch (err) {
     logger.errorLog.error("fee fetch fail");
-    res.send({ statusCode: 500, massage: "fee fetch fail", error: err });
+    res.send({ statusCode: 500, message: "fee fetch fail", error: err });
   }
 };
 
@@ -60,12 +60,12 @@ exports.readAllFee = async (req, res) => {
     logger.accessLog.info("fee fetch success");
     res.send({
       statusCode: 200,
-      massage: "fee fetch successfully",
+      message: "fee fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("fee fetch fail");
-    res.send({ statusCode: 500, massage: "fee fetch fail", error: err });
+    res.send({ statusCode: 500, message: "fee fetch fail", error: err });
   }
 };
 
@@ -76,12 +76,12 @@ exports.readFeeById = async (req, res) => {
     logger.accessLog.info("fee fetch success");
     res.send({
       statusCode: 200,
-      massage: "fee fetch successfully",
+      message: "fee fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("fee fetch fail");
-    res.send({ statusCode: 500, massage: "fee fetch fail", error: err });
+    res.send({ statusCode: 500, message: "fee fetch fail", error: err });
   }
 };
 
@@ -93,7 +93,7 @@ exports.createFee = async (req, res) => {
       logger.accessLog.info("fee create successfully");
       res.send({
         statusCode: 200,
-        massage: "The fee has been created successfully",
+        message: "The fee has been created successfully",
         fee: newFee,
       });
     }
@@ -101,7 +101,7 @@ exports.createFee = async (req, res) => {
     logger.errorLog.error("fee create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -116,7 +116,7 @@ exports.updateFee = async (req, res) => {
       logger.accessLog.info("fee update Successfully");
       res.send({
         statusCode: 200,
-        massage: "The fee has been updated successfully",
+        message: "The fee has been updated successfully",
         fee: updateFee,
       });
     }
@@ -124,7 +124,7 @@ exports.updateFee = async (req, res) => {
     logger.errorLog.error("fee update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -139,14 +139,14 @@ exports.deleteFee = async (req, res) => {
     logger.accessLog.info("fee delete successfully");
     res.send({
       statusCode: 200,
-      massage: "The fee has been deleted successfully",
+      message: "The fee has been deleted successfully",
       fee: deleteFee,
     });
   } catch (err) {
     logger.errorLog.error("fee delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

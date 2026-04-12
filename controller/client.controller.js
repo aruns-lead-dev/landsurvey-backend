@@ -81,7 +81,7 @@ exports.readClients = async (req, res) => {
     logger.accessLog.info("client fetch successfully");
     res.send({
       statusCode: 200,
-      massage: "The client has been fetched successfully",
+      message: "The client has been fetched successfully",
       total: totalDataCount,
       data: allClients,
     });
@@ -89,7 +89,7 @@ exports.readClients = async (req, res) => {
     logger.errorLog.error("client fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the client",
+      message: "Failed to fetch the client",
       error: err,
     });
   }
@@ -111,14 +111,14 @@ exports.readClientById = async (req, res) => {
     logger.accessLog.info("client fetch success");
     res.send({
       statusCode: 200,
-      massage: "The client has been fetched successfully",
+      message: "The client has been fetched successfully",
       data: clientData,
     });
   } catch (err) {
     logger.errorLog.error("client fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the client",
+      message: "Failed to fetch the client",
       error: err,
     });
   }
@@ -136,14 +136,14 @@ exports.readAllClient = async (req, res) => {
     logger.accessLog.info("client fetch success");
     res.send({
       statusCode: 200,
-      massage: "The client has been fetched successfully",
+      message: "The client has been fetched successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("client fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the client",
+      message: "Failed to fetch the client",
       error: err,
     });
   }
@@ -201,7 +201,7 @@ exports.createClient = async (req, res) => {
     ) {
       return res.send({
         statusCode: 500,
-        massage:
+        message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
           "Oops Something went wrong. Please contact the administrator---",
       });
@@ -213,7 +213,7 @@ exports.createClient = async (req, res) => {
       if (existingClient) {
         return res.send({
           statusCode: 500,
-          massage: "Client Duplicate Name Exists Error",
+          message: "Client Duplicate Name Exists Error",
         });
       }
     }
@@ -232,7 +232,7 @@ exports.createClient = async (req, res) => {
       ) {
         return res.send({
           statusCode: 500,
-          massage:
+          message:
             `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
             "Oops Something went wrong. Please contact the administrator",
         });
@@ -344,7 +344,7 @@ exports.createClient = async (req, res) => {
       logger.accessLog.info("client create successfully");
       res.send({
         statusCode: 200,
-        massage: "The client has been created successfully",
+        message: "The client has been created successfully",
         client: newClient,
       });
     }
@@ -352,7 +352,7 @@ exports.createClient = async (req, res) => {
     logger.errorLog.error("client create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -424,7 +424,7 @@ exports.updateClient = async (req, res) => {
     ) {
       return res.send({
         statusCode: 500,
-        massage:
+        message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
           "Oops Something went wrong. Please contact the administrator",
       });
@@ -578,7 +578,7 @@ exports.updateClient = async (req, res) => {
       logger.accessLog.info("client update successfully");
       res.send({
         statusCode: 200,
-        massage: "The client has been updated successfully",
+        message: "The client has been updated successfully",
         client: updateClientData,
       });
     }
@@ -586,7 +586,7 @@ exports.updateClient = async (req, res) => {
     logger.errorLog.error("client update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -613,14 +613,14 @@ exports.deleteClient = async (req, res) => {
     logger.accessLog.info("client delete successfully");
     res.send({
       statusCode: 200,
-      massage: "The client has been deleted successfully",
+      message: "The client has been deleted successfully",
       client: deleteClientData,
     });
   } catch (err) {
     logger.errorLog.error("client delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

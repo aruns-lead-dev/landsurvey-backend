@@ -98,7 +98,7 @@ async function migrate() {
           : null,
         group_number: 0, // default (customize if needed)
         sequence_number: 0, // default
-        planned_date: task.planned_date || null,
+        planned_date: null,
         cost_item: task.cost_item ? [task.cost_item] : [],
         assigned_members: [],
         comments: [],
