@@ -219,7 +219,7 @@ exports.readDwr = async (req, res) => {
     logger.accessLog.info("dwr fetch successfully");
     res.send({
       statusCode: 200,
-      massage: "The DWR has been fetched successfully",
+      message: "The DWR has been fetched successfully",
       total: 0,
       data: alldwrs,
     });
@@ -227,7 +227,7 @@ exports.readDwr = async (req, res) => {
     logger.errorLog.error("Failed to fetch the DWR.");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the DWR",
+      message: "Failed to fetch the DWR",
       error: err,
     });
   }
@@ -248,14 +248,14 @@ exports.readDwrById = async (req, res) => {
     logger.accessLog.info("dwr fetch success");
     res.send({
       statusCode: 200,
-      massage: "The DWR has been fetched successfully",
+      message: "The DWR has been fetched successfully",
       data: dwrData,
     });
   } catch (err) {
     logger.errorLog.error("Failed to fetch the DWR.");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the DWR",
+      message: "Failed to fetch the DWR",
       error: err,
     });
   }
@@ -277,14 +277,14 @@ exports.readAllDwr = async (req, res) => {
     logger.accessLog.info("dwr fetch success");
     res.send({
       statusCode: 200,
-      massage: "The DWR has been fetched successfully",
+      message: "The DWR has been fetched successfully",
       data: dwrData,
     });
   } catch (err) {
     logger.errorLog.error("Failed to fetch the DWR.");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the DWR",
+      message: "Failed to fetch the DWR",
       error: err,
     });
   }
@@ -409,7 +409,7 @@ exports.createDwr = async (req, res) => {
         logger.accessLog.info("dwr create successfully");
         return res.send({
           statusCode: 200,
-          massage: "The DWR has been created successfully",
+          message: "The DWR has been created successfully",
           dwr: Promise_dwr,
         });
       })
@@ -418,7 +418,7 @@ exports.createDwr = async (req, res) => {
         logger.errorLog.error("dwr create fail");
         return res.send({
           statusCode: 500,
-          massage:
+          message:
             "Oops Something went wrong. Please contact the administrator",
           error: err,
         });
@@ -427,7 +427,7 @@ exports.createDwr = async (req, res) => {
     logger.errorLog.error("dwr create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -559,7 +559,7 @@ exports.updateDwr = async (req, res) => {
       logger.accessLog.info("dwr Update Successfully");
       res.send({
         statusCode: 200,
-        massage: "The DWR has been updated successfully",
+        message: "The DWR has been updated successfully",
         client: updatedwrData,
       });
     }
@@ -567,7 +567,7 @@ exports.updateDwr = async (req, res) => {
     logger.errorLog.error("dwr update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -739,14 +739,14 @@ exports.updateDwrAdmin = async (req, res) => {
       logger.accessLog.info("dwr Update Successfully");
       res.send({
         statusCode: 200,
-        massage: "The DWR has been updated successfully",
+        message: "The DWR has been updated successfully",
       });
     }
   } catch (err) {
     logger.errorLog.error("dwr update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -785,14 +785,14 @@ exports.updateDwrStatus = async (req, res) => {
       logger.accessLog.info("dwr status updated Successfully");
       res.send({
         statusCode: 200,
-        massage: "The DWR status has been updated successfully",
+        message: "The DWR status has been updated successfully",
       });
     }
   } catch (err) {
     logger.errorLog.error("dwr status update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -820,14 +820,14 @@ exports.getDwrHoursByTaskId = async (req, res) => {
     logger.accessLog.info("dwr fetch success");
     res.send({
       statusCode: 200,
-      massage: "The DWR has been fetched successfully",
+      message: "The DWR has been fetched successfully",
       data: dwrData,
     });
   } catch (err) {
     logger.errorLog.error("Failed to fetch the DWR.");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the DWR",
+      message: "Failed to fetch the DWR",
       error: err,
     });
   }
@@ -844,20 +844,20 @@ exports.deleteDwr = async (req, res) => {
       logger.accessLog.info("dwr delete successfully");
       res.send({
         statusCode: 200,
-        massage: "The DWR has been deleted successfully",
+        message: "The DWR has been deleted successfully",
         dwr: deletedwrData,
       });
     } else {
       res.send({
         statusCode: 404,
-        massage: "The DWR could not be found",
+        message: "The DWR could not be found",
       });
     }
   } catch (err) {
     logger.errorLog.error("dwr delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

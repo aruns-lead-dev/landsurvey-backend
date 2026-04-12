@@ -16,7 +16,7 @@ exports.forgotPasswordWorker = async (job) => {
         let transporter = nodemailer.createTransport(emailConfig)
         ejs.renderFile(__dirname + '/../views/email/resetPassword.ejs', { resetLink: `${process.env.FORNTEND_URL}/confirm-password/${tokenTemp}` }, (err, data) => {
             if (err) {
-                return { statusCode: 500, massage: `Error : ${err}` };
+                return { statusCode: 500, message: `Error : ${err}` };
             } else {
                 const mailData = {
                     from: `Elevated Land Surveying <${process.env.SMTP_EMAIL}>`,
@@ -27,15 +27,15 @@ exports.forgotPasswordWorker = async (job) => {
                 transporter.sendMail(mailData, (error, info) => {
                     if (error) {
                         console.log(error);
-                        return { statusCode: 500, massage: `Error : ${error}` };
+                        return { statusCode: 500, message: `Error : ${error}` };
                     }
                     else {
                         console.log(info);
-                        return { statusCode: 200, massage: `${process.env.FORNTEND_URL}/confirm-password/${tokenTemp}` };
+                        return { statusCode: 200, message: `${process.env.FORNTEND_URL}/confirm-password/${tokenTemp}` };
                     }
                 });
             }
         });
-        return { statusCode: 200, massage: `Reset Link Sended to ${job.data.email} Successfully`, resetLink: `${process.env.FORNTEND_URL}/confirm-password/${tokenTemp}` };
+        return { statusCode: 200, message: `Reset Link Sended to ${job.data.email} Successfully`, resetLink: `${process.env.FORNTEND_URL}/confirm-password/${tokenTemp}` };
     }
 }

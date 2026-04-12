@@ -41,7 +41,7 @@ exports.readRatesheet = async (req, res) => {
     logger.accessLog.info("ratesheet fetch fail");
     res.send({
       statusCode: 200,
-      massage: "The ratesheet has been fetched successfully",
+      message: "The ratesheet has been fetched successfully",
       total: totalDataCount,
       data: allUsers,
     });
@@ -49,7 +49,7 @@ exports.readRatesheet = async (req, res) => {
     logger.errorLog.error("ratesheet fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the ratesheet",
+      message: "Failed to fetch the ratesheet",
       error: err,
     });
   }
@@ -61,14 +61,14 @@ exports.readAllRatesheet = async (req, res) => {
     logger.accessLog.info("ratesheet fetch success");
     res.send({
       statusCode: 200,
-      massage: "The ratesheet has been fetched successfully",
+      message: "The ratesheet has been fetched successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("ratesheet fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the ratesheet",
+      message: "Failed to fetch the ratesheet",
       error: err,
     });
   }
@@ -81,14 +81,14 @@ exports.readRatesheetById = async (req, res) => {
     logger.accessLog.info("ratesheet fetch success");
     res.send({
       statusCode: 200,
-      massage: "The ratesheet has been fetched successfully",
+      message: "The ratesheet has been fetched successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("ratesheet fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the ratesheet",
+      message: "Failed to fetch the ratesheet",
       error: err,
     });
   }
@@ -113,7 +113,7 @@ exports.createRatesheet = async (req, res) => {
       logger.accessLog.info("ratesheet create successfully");
       res.send({
         statusCode: 200,
-        massage: "The ratesheet has been created successfully",
+        message: "The ratesheet has been created successfully",
         ratesheet: newRatesheet,
       });
     }
@@ -121,7 +121,7 @@ exports.createRatesheet = async (req, res) => {
     logger.errorLog.error("Failed to create the ratesheet.");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -147,7 +147,7 @@ exports.updateRatesheet = async (req, res) => {
       logger.accessLog.info("ratesheet update fail");
       res.send({
         statusCode: 200,
-        massage: "The ratesheet has been updated successfully",
+        message: "The ratesheet has been updated successfully",
         ratesheet: updateRatesheet,
       });
     }
@@ -155,7 +155,7 @@ exports.updateRatesheet = async (req, res) => {
     logger.errorLog.error("ratesheet update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -192,14 +192,14 @@ exports.deleteRatesheet = async (req, res) => {
     logger.accessLog.info("ratesheet delete fail");
     res.send({
       statusCode: 200,
-      massage: "The ratesheet has been deleted successfully",
+      message: "The ratesheet has been deleted successfully",
       ratesheet: deleteRatesheet,
     });
   } catch (err) {
     logger.errorLog.error("ratesheet delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

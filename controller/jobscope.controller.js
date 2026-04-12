@@ -44,13 +44,13 @@ exports.readJobScope = async (req, res) => {
     logger.accessLog.info("jobscope fetch fail");
     res.send({
       statusCode: 200,
-      massage: "jobscope fetch successfully",
+      message: "jobscope fetch successfully",
       total: totalDataCount,
       data: allUsers,
     });
   } catch (err) {
     logger.errorLog.error("jobscope fetch fail");
-    res.send({ statusCode: 500, massage: "jobscope fetch fail", error: err });
+    res.send({ statusCode: 500, message: "jobscope fetch fail", error: err });
   }
 };
 
@@ -60,12 +60,12 @@ exports.readAllJobScope = async (req, res) => {
     logger.accessLog.info("jobscope fetch success");
     res.send({
       statusCode: 200,
-      massage: "jobscope fetch successfully",
+      message: "jobscope fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("jobscope fetch fail");
-    res.send({ statusCode: 500, massage: "jobscope fetch fail", error: err });
+    res.send({ statusCode: 500, message: "jobscope fetch fail", error: err });
   }
 };
 
@@ -76,12 +76,12 @@ exports.readJobScopeById = async (req, res) => {
     logger.accessLog.info("jobscope fetch success");
     res.send({
       statusCode: 200,
-      massage: "jobscope fetch successfully",
+      message: "jobscope fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("jobscope fetch fail");
-    res.send({ statusCode: 500, massage: "jobscope fetch fail", error: err });
+    res.send({ statusCode: 500, message: "jobscope fetch fail", error: err });
   }
 };
 
@@ -93,7 +93,7 @@ exports.createJobScope = async (req, res) => {
       logger.accessLog.info("jobscope create successfully");
       res.send({
         statusCode: 200,
-        massage: "The job scope has been created successfully",
+        message: "The job scope has been created successfully",
         jobscope: newJobScope,
       });
     }
@@ -101,7 +101,7 @@ exports.createJobScope = async (req, res) => {
     logger.errorLog.error("jobscope create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -116,7 +116,7 @@ exports.updateJobScope = async (req, res) => {
       logger.accessLog.info("jobscope update fail");
       res.send({
         statusCode: 200,
-        massage: "The job scope has been updated successfully",
+        message: "The job scope has been updated successfully",
         jobscope: updateJobScope,
       });
     }
@@ -124,7 +124,7 @@ exports.updateJobScope = async (req, res) => {
     logger.errorLog.error("jobscope update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -139,14 +139,14 @@ exports.deleteJobScope = async (req, res) => {
     logger.accessLog.info("jobscope delete fail");
     res.send({
       statusCode: 200,
-      massage: "The job scope has been deleted successfully",
+      message: "The job scope has been deleted successfully",
       jobscope: deleteJobScope,
     });
   } catch (err) {
     logger.errorLog.error("jobscope delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

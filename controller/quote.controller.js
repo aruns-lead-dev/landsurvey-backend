@@ -53,13 +53,13 @@ exports.readQuotes = async (req, res) => {
     logger.accessLog.info("quote fetch successfully");
     res.send({
       statusCode: 200,
-      massage: "The quote has been fetched successfully",
+      message: "The quote has been fetched successfully",
       total: totalDataCount,
       data: allQuotes,
     });
   } catch (err) {
     logger.errorLog.error("quote fetch fail");
-    res.send({ statusCode: 500, massage: "Failed to fetch the quote", error: err });
+    res.send({ statusCode: 500, message: "Failed to fetch the quote", error: err });
   }
 };
 
@@ -78,12 +78,12 @@ exports.readQuoteById = async (req, res) => {
     logger.accessLog.info("quote fetch success");
     res.send({
       statusCode: 200,
-      massage: "The quote has been fetched successfully",
+      message: "The quote has been fetched successfully",
       data: quoteData,
     });
   } catch (err) {
     logger.errorLog.error("quote fetch fail");
-    res.send({ statusCode: 500, massage: "Failed to fetch the quote", error: err });
+    res.send({ statusCode: 500, message: "Failed to fetch the quote", error: err });
   }
 };
 
@@ -98,12 +98,12 @@ exports.readAllQuote = async (req, res) => {
     logger.accessLog.info("quote fetch success");
     res.send({
       statusCode: 200,
-      massage: "The quote has been fetched successfully",
+      message: "The quote has been fetched successfully",
       data: quoteData,
     });
   } catch (err) {
     logger.errorLog.error("quote fetch fail");
-    res.send({ statusCode: 500, massage: "Failed to fetch the quote", error: err });
+    res.send({ statusCode: 500, message: "Failed to fetch the quote", error: err });
   }
 };
 
@@ -173,7 +173,7 @@ exports.createQuote = async (req, res) => {
       logger.accessLog.info("quote create successfully");
       res.send({
         statusCode: 200,
-        massage: "The quote has been created successfully",
+        message: "The quote has been created successfully",
         quote: newQuote,
       });
     }
@@ -181,7 +181,7 @@ exports.createQuote = async (req, res) => {
     logger.errorLog.error("quote create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -249,7 +249,7 @@ exports.updateQuote = async (req, res) => {
       logger.accessLog.info("quote update successfully");
       res.send({
         statusCode: 200,
-        massage: "The quote has been updated successfully",
+        message: "The quote has been updated successfully",
         client: updateQuoteData,
       });
     }
@@ -257,7 +257,7 @@ exports.updateQuote = async (req, res) => {
     logger.errorLog.error("quote update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -289,20 +289,20 @@ exports.deleteQuote = async (req, res) => {
       logger.accessLog.info("quote delete successfully");
       res.send({
         statusCode: 200,
-        massage: "The quote has been deleted successfully",
+        message: "The quote has been deleted successfully",
         quote: deleteQuoteData,
       });
     } else {
       res.send({
         statusCode: 404,
-        massage: "The quote could not be found",
+        message: "The quote could not be found",
       });
     }
   } catch (err) {
     logger.errorLog.error("quote delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

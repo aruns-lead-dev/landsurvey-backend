@@ -33,7 +33,7 @@ exports.readSchedule = async (req, res) => {
     }
     const skip = page * per_page - per_page;
 
-    var myMatch = { is_deleted: false };
+    var myMatch = { is_deleted: false, status: { $ne: 'completed' } };
 
     if (
       user_id &&
@@ -157,8 +157,15 @@ exports.createSchedule = async (req, res) => {
 
 exports.readAllSchedule = async (req, res) => {
   try {
+    const now = new Date();
+    const year = parseInt(req.query.year) || now.getFullYear();
+    const month = req.query.month !== undefined ? parseInt(req.query.month) : now.getMonth();
+
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 1);
+
     const data = await scheduling.aggregate([
-      { $match: { is_deleted: false, status: { $in: ['open', 'assigned'] } } },
+      { $match: { is_deleted: false, planned_date: { $gte: startDate, $lt: endDate } } },
       ...SCHEDULING_PIPELINE,
       { $sort: { createdAt: -1 } },
     ]);
@@ -296,7 +303,7 @@ exports.updateSchedule = async (req, res) => {
     logger.errorLog.error('schedule update fail');
     res.send({
       statusCode: 500,
-      massage: 'Oops Something went wrong. Please contact the administrator',
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }

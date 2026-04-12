@@ -43,7 +43,7 @@ const dwrValidation = async (req, res, next) => {
     console.log(error);
     return res.json({
       status: 403,
-      massage: error.details[0].message,
+      message: error.details[0].message,
       success: false,
     });
   } else {

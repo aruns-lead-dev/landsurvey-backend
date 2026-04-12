@@ -38,11 +38,11 @@ exports.readOffice = async (req, res) => {
             ]);
         }
         logger.accessLog.info("office fetch fail")
-        res.send({ statusCode: 200, massage: "office fetch successfully", total: totalDataCount, data: allUsers })
+        res.send({ statusCode: 200, message: "office fetch successfully", total: totalDataCount, data: allUsers })
     }
     catch (err) {
         logger.errorLog.error("office fetch fail")
-        res.send({ statusCode: 500, massage: "office fetch fail", error: err })
+        res.send({ statusCode: 500, message: "office fetch fail", error: err })
     }
 }
 
@@ -51,11 +51,11 @@ exports.readOfficeById = async (req, res) => {
         const { id } = req.params
         const userData = await office.findOne({ _id: id, is_deleted: false })
         logger.accessLog.info("office fetch success")
-        res.send({ statusCode: 200, massage: "office fetch successfully", data: userData })
+        res.send({ statusCode: 200, message: "office fetch successfully", data: userData })
     }
     catch (err) {
         logger.errorLog.error("office fetch fail")
-        res.send({ statusCode: 500, massage: "office fetch fail", error: err })
+        res.send({ statusCode: 500, message: "office fetch fail", error: err })
     }
 }
 
@@ -63,11 +63,11 @@ exports.readAllOffice = async (req, res) => {
     try {
         const userData = await office.find({ is_deleted: false }).sort({ createdAt: -1 })
         logger.accessLog.info("office fetch success")
-        res.send({ statusCode: 200, massage: "office fetch successfully", data: userData })
+        res.send({ statusCode: 200, message: "office fetch successfully", data: userData })
     }
     catch (err) {
         logger.errorLog.error("office fetch fail")
-        res.send({ statusCode: 500, massage: "office fetch fail", error: err })
+        res.send({ statusCode: 500, message: "office fetch fail", error: err })
     }
 }
 
@@ -79,12 +79,12 @@ exports.createOffice = async (req, res) => {
         if (newOffice) {
             await newOffice.save()
             logger.accessLog.info("office create fail")
-            res.send({ statusCode: 200, massage: "The office has been created successfully", office: newOffice })
+            res.send({ statusCode: 200, message: "The office has been created successfully", office: newOffice })
         }
     }
     catch (err) {
         logger.errorLog.error("office create fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }
 
@@ -97,12 +97,12 @@ exports.updateOffice = async (req, res) => {
         if (updateOffice) {
             await updateOffice.save()
             logger.accessLog.info("office updated successfully")
-            res.send({ statusCode: 200, massage: "The office has been updated successfully", office: updateOffice })
+            res.send({ statusCode: 200, message: "The office has been updated successfully", office: updateOffice })
         }
     }
     catch (err) {
         logger.errorLog.error("office update fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }
 
@@ -113,10 +113,10 @@ exports.deleteOffice = async (req, res) => {
         const { id } = req.params
         const deleteOffice = await office.findByIdAndUpdate(id, { $set: { is_deleted: true } })
         logger.accessLog.info("office delete fail")
-        res.send({ statusCode: 200, massage: "The office has been deleted successfully", office: deleteOffice })
+        res.send({ statusCode: 200, message: "The office has been deleted successfully", office: deleteOffice })
     }
     catch (err) {
         logger.errorLog.error("office delete fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }

@@ -42,13 +42,13 @@ exports.readTax = async (req, res) => {
     logger.accessLog.info("tax fetch fail");
     res.send({
       statusCode: 200,
-      massage: "tax fetch successfully",
+      message: "tax fetch successfully",
       total: totalDataCount,
       data: allUsers,
     });
   } catch (err) {
     logger.errorLog.error("tax fetch fail");
-    res.send({ statusCode: 500, massage: "tax fetch fail", error: err });
+    res.send({ statusCode: 500, message: "tax fetch fail", error: err });
   }
 };
 
@@ -58,12 +58,12 @@ exports.readAllTax = async (req, res) => {
     logger.accessLog.info("tax fetch success");
     res.send({
       statusCode: 200,
-      massage: "tax fetch successfully",
+      message: "tax fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("tax fetch fail");
-    res.send({ statusCode: 500, massage: "tax fetch fail", error: err });
+    res.send({ statusCode: 500, message: "tax fetch fail", error: err });
   }
 };
 
@@ -74,12 +74,12 @@ exports.readTaxById = async (req, res) => {
     logger.accessLog.info("tax fetch success");
     res.send({
       statusCode: 200,
-      massage: "tax fetch successfully",
+      message: "tax fetch successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("tax fetch fail");
-    res.send({ statusCode: 500, massage: "tax fetch fail", error: err });
+    res.send({ statusCode: 500, message: "tax fetch fail", error: err });
   }
 };
 
@@ -91,7 +91,7 @@ exports.createTax = async (req, res) => {
       logger.accessLog.info("tax create success");
       res.send({
         statusCode: 200,
-        massage: "The tax has been created successfully.",
+        message: "The tax has been created successfully.",
         tax: newTax,
       });
     }
@@ -99,7 +99,7 @@ exports.createTax = async (req, res) => {
     logger.errorLog.error("tax create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -114,7 +114,7 @@ exports.updateTax = async (req, res) => {
       logger.accessLog.info("tax update successfully");
       res.send({
         statusCode: 200,
-        massage: "The tax has been updated successfully",
+        message: "The tax has been updated successfully",
         tax: updateTax,
       });
     }
@@ -122,7 +122,7 @@ exports.updateTax = async (req, res) => {
     logger.errorLog.error("tax update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -137,14 +137,14 @@ exports.deleteTax = async (req, res) => {
     logger.accessLog.info("tax delete fail");
     res.send({
       statusCode: 200,
-      massage: "The tax has been deleted successfully",
+      message: "The tax has been deleted successfully",
       tax: deleteTax,
     });
   } catch (err) {
     logger.errorLog.error("tax delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

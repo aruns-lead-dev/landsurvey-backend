@@ -20,14 +20,14 @@ exports.readUserById = async (req, res) => {
     const userData = await user.findOne({ _id: id, is_deleted: false });
     res.send({
       statusCode: 200,
-      massage: "The user has been fetched successfully",
+      message: "The user has been fetched successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("Failed to fetch the user.");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the user",
+      message: "Failed to fetch the user",
       error: err,
     });
   }
@@ -50,14 +50,14 @@ exports.readUserByRole = async (req, res) => {
     logger.accessLog.info("user fetch success");
     res.send({
       statusCode: 200,
-      massage: "The user has been fetched successfully",
+      message: "The user has been fetched successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("Failed to fetch the user.");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the user",
+      message: "Failed to fetch the user",
       error: err,
     });
   }
@@ -121,7 +121,7 @@ exports.readUser = async (req, res) => {
     logger.accessLog.info("Failed to fetch the user.");
     res.send({
       statusCode: 200,
-      massage: "The user has been fetched successfully",
+      message: "The user has been fetched successfully",
       total: totalDataCount,
       data: allUsers,
     });
@@ -129,7 +129,7 @@ exports.readUser = async (req, res) => {
     logger.errorLog.error("Failed to fetch the user.");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the user",
+      message: "Failed to fetch the user",
       error: err,
     });
   }
@@ -162,7 +162,7 @@ exports.createUser = async (req, res) => {
               { user: newUser, password: password },
               (err, data) => {
                 if (err) {
-                  return { statusCode: 500, massage: `Error : ${err}` };
+                  return { statusCode: 500, message: `Error : ${err}` };
                 } else {
                   const mailData = {
                     from: `Elevated Land Surveying <${process.env.SMTP_EMAIL}>`,
@@ -173,12 +173,12 @@ exports.createUser = async (req, res) => {
                   transporter.sendMail(mailData, (error, info) => {
                     if (error) {
                       console.log(error);
-                      return { statusCode: 500, massage: `Error : ${error}` };
+                      return { statusCode: 500, message: `Error : ${error}` };
                     } else {
                       console.log(info);
                       return {
                         statusCode: 200,
-                        massage: `Your Account Has Been Created!`,
+                        message: `Your Account Has Been Created!`,
                         data: { email: req.body.email },
                       };
                     }
@@ -189,7 +189,7 @@ exports.createUser = async (req, res) => {
 
             res.send({
               statusCode: 200,
-              massage: "User Created Successfully",
+              message: "User Created Successfully",
               data: { email: req.body.email },
             });
           }
@@ -198,14 +198,14 @@ exports.createUser = async (req, res) => {
     } else {
       res.send({
         statusCode: 500,
-        massage: "Email Already Exist Try Other Email",
+        message: "Email Already Exist Try Other Email",
       });
     }
   } catch (err) {
     logger.errorLog.error("user create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator.",
+      message: "Oops Something went wrong. Please contact the administrator.",
       error: err,
     });
   }
@@ -274,7 +274,7 @@ exports.editUser = async (req, res) => {
       const newUser = await user.findById(id);
       res.send({
         statusCode: 200,
-        massage: "The user has been edited successfully",
+        message: "The user has been edited successfully",
         user: newUser,
       });
     }
@@ -282,7 +282,7 @@ exports.editUser = async (req, res) => {
     logger.errorLog.error("user edit fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -311,7 +311,7 @@ exports.initialChangePassword = async (req, res) => {
                 logger.accessLog.info("Password Changed Successfull");
                 res.send({
                   statusCode: 200,
-                  massage: "The password has been changed successfully",
+                  message: "The password has been changed successfully",
                   token: token.token,
                   user: { ...newUser._doc, password_changed: true },
                 });
@@ -326,13 +326,13 @@ exports.initialChangePassword = async (req, res) => {
       });
     } else {
       logger.accessLog.info("User Not Found");
-      res.send({ statusCode: 404, massage: "The user could not be found" });
+      res.send({ statusCode: 404, message: "The user could not be found" });
     }
   } catch (err) {
     logger.errorLog.error("Password Chnage fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -365,7 +365,7 @@ exports.changePassword = async (req, res) => {
                     logger.accessLog.info("Password Changed Successfull");
                     res.send({
                       statusCode: 200,
-                      massage: "The password has been changed successfully",
+                      message: "The password has been changed successfully",
                       token: token.token,
                       user: newUser,
                     });
@@ -381,7 +381,7 @@ exports.changePassword = async (req, res) => {
         } else {
           res.send({
             statusCode: 404,
-            massage: "Current password does not match. Try again",
+            message: "Current password does not match. Try again",
             error: err,
           });
         }
@@ -391,7 +391,7 @@ exports.changePassword = async (req, res) => {
     logger.errorLog.error("Password Chnage fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -406,14 +406,14 @@ exports.deleteUser = async (req, res) => {
     logger.accessLog.info("user delete fail");
     res.send({
       statusCode: 200,
-      massage: "The user has been deleted successfullyy",
+      message: "The user has been deleted successfullyy",
       user: deleteUser,
     });
   } catch (err) {
     logger.errorLog.error("user delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

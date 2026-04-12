@@ -5,6 +5,7 @@ exports.schedulingStatusWorker = async (job) => {
     {
       status: { $in: ['open', 'assigned'] },
       is_deleted: false,
+      planned_date: { $lt: new Date() },
     },
     { $set: { status: 'completed' } }
   );

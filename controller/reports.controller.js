@@ -86,7 +86,7 @@ exports.reportCreate = async (req, res) => {
     logger.errorLog.error("task fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the task",
+      message: "Failed to fetch the task",
       error: err,
     });
   }
@@ -116,7 +116,7 @@ exports.reportEmployees = async (req, res) => {
     logger.errorLog.error("task fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the task",
+      message: "Failed to fetch the task",
       error: err,
     });
   }

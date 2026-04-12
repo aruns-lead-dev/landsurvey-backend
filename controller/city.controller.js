@@ -87,13 +87,13 @@ exports.readCity = async (req, res) => {
     logger.accessLog.info("city fetch fail");
     res.send({
       statusCode: 200,
-      massage: "City Fetch Successfully",
+      message: "City Fetch Successfully",
       total: totalDataCount,
       data: allUsers,
     });
   } catch (err) {
     logger.errorLog.error("city fetch fail");
-    res.send({ statusCode: 500, massage: "City Fetch Fail", error: err });
+    res.send({ statusCode: 500, message: "City Fetch Fail", error: err });
   }
 };
 
@@ -112,12 +112,12 @@ exports.readCityById = async (req, res) => {
     logger.accessLog.info("City fetch success");
     res.send({
       statusCode: 200,
-      massage: "City Fetch Successfully",
+      message: "City Fetch Successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("city fetch fail");
-    res.send({ statusCode: 500, massage: "City Fetch Fail", error: err });
+    res.send({ statusCode: 500, message: "City Fetch Fail", error: err });
   }
 };
 
@@ -133,12 +133,12 @@ exports.readAllCity = async (req, res) => {
     logger.accessLog.info("city fetch success");
     res.send({
       statusCode: 200,
-      massage: "City Fetch Successfully",
+      message: "City Fetch Successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("city fetch fail");
-    res.send({ statusCode: 500, massage: "City Fetch Fail", error: err });
+    res.send({ statusCode: 500, message: "City Fetch Fail", error: err });
   }
 };
 
@@ -156,7 +156,7 @@ exports.createCity = async (req, res) => {
       logger.accessLog.info("city create fail");
       res.send({
         statusCode: 200,
-        massage: "The city has been created successfully",
+        message: "The city has been created successfully",
         city: newCity,
       });
     }
@@ -164,7 +164,7 @@ exports.createCity = async (req, res) => {
     logger.errorLog.error("city create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -184,7 +184,7 @@ exports.updateCity = async (req, res) => {
       logger.accessLog.info("city update fail");
       res.send({
         statusCode: 200,
-        massage: "The city has been updated successfully",
+        message: "The city has been updated successfully",
         city: updateCity,
       });
     }
@@ -192,7 +192,7 @@ exports.updateCity = async (req, res) => {
     logger.errorLog.error("city update fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -207,14 +207,14 @@ exports.deleteCity = async (req, res) => {
     logger.accessLog.info("city delete fail");
     res.send({
       statusCode: 200,
-      massage: "The city has been deleted successfully",
+      message: "The city has been deleted successfully",
       city: deleteCity,
     });
   } catch (err) {
     logger.errorLog.error("city delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

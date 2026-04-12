@@ -22,14 +22,14 @@ exports.readJobById = async (req, res) => {
     logger.accessLog.info("job fetch success");
     res.send({
       statusCode: 200,
-      massage: "The job has been fetched successfully",
+      message: "The job has been fetched successfully",
       data: jobData,
     });
   } catch (err) {
     logger.errorLog.error("job fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the job",
+      message: "Failed to fetch the job",
       error: err,
     });
   }
@@ -68,14 +68,14 @@ exports.JobSearch = async (req, res) => {
 
     res.send({
       statusCode: 200,
-      massage: "The job has been fetched successfully",
+      message: "The job has been fetched successfully",
       data: allTasks,
     });
   } catch (err) {
     logger.errorLog.error("job fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the job",
+      message: "Failed to fetch the job",
       error: err,
     });
   }
@@ -155,7 +155,7 @@ exports.readJob = async (req, res) => {
     logger.accessLog.info("job fetch success");
     res.send({
       statusCode: 200,
-      massage: "The job has been fetched successfully",
+      message: "The job has been fetched successfully",
       total: totalDataCount,
       data: allJobs,
     });
@@ -163,7 +163,7 @@ exports.readJob = async (req, res) => {
     logger.errorLog.error("job fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the job",
+      message: "Failed to fetch the job",
       error: err,
     });
   }
@@ -215,7 +215,7 @@ exports.managerReadJob = async (req, res) => {
     logger.accessLog.info("job fetch success");
     res.send({
       statusCode: 200,
-      massage: "manager job data fetch successfully",
+      message: "manager job data fetch successfully",
       total: totalDataCount,
       data: allJobs,
     });
@@ -223,7 +223,7 @@ exports.managerReadJob = async (req, res) => {
     logger.errorLog.error("job fetch fail");
     res.send({
       statusCode: 500,
-      massage: "manager job data fetch fail",
+      message: "manager job data fetch fail",
       error: err,
     });
   }
@@ -241,14 +241,14 @@ exports.readAllJob = async (req, res) => {
     logger.accessLog.info("job fetch success");
     res.send({
       statusCode: 200,
-      massage: "The job has been fetched successfully",
+      message: "The job has been fetched successfully",
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error("job fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the job",
+      message: "Failed to fetch the job",
       error: err,
     });
   }
@@ -308,7 +308,7 @@ exports.createJob = async (req, res) => {
       logger.accessLog.info("The job has been created successfully");
       res.send({
         statusCode: 200,
-        massage: "The job has been created successfully",
+        message: "The job has been created successfully",
         job: newJob,
       });
     }
@@ -316,7 +316,7 @@ exports.createJob = async (req, res) => {
     logger.errorLog.error("Failed to create the job");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -380,7 +380,7 @@ exports.updateJob = async (req, res) => {
       logger.accessLog.info("The job has been updated successfully.");
       res.send({
         statusCode: 200,
-        massage: "The job has been updated successfully",
+        message: "The job has been updated successfully",
         job: updateJobData,
       });
     }
@@ -388,7 +388,7 @@ exports.updateJob = async (req, res) => {
     logger.errorLog.error("Failed to update the job.");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -431,14 +431,14 @@ exports.deleteJob = async (req, res) => {
     logger.accessLog.info("Job deleted successfully.");
     res.send({
       statusCode: 200,
-      massage: "Job deleted successfully",
+      message: "Job deleted successfully",
       job: deleteJobData,
     });
   } catch (err) {
     logger.errorLog.error("Failed to delete the job.");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }

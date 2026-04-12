@@ -40,11 +40,11 @@ exports.readClientType = async (req, res) => {
 
         }
         logger.accessLog.info("client_type fetch fail")
-        res.send({ statusCode: 200, massage: "client_type fetch successfully", total: totalDataCount, data: allUsers })
+        res.send({ statusCode: 200, message: "client_type fetch successfully", total: totalDataCount, data: allUsers })
     }
     catch (err) {
         logger.errorLog.error("client_type fetch fail")
-        res.send({ statusCode: 500, massage: "client_type fetch fail", error: err })
+        res.send({ statusCode: 500, message: "client_type fetch fail", error: err })
     }
 }
 
@@ -52,11 +52,11 @@ exports.readAllClientType = async (req, res) => {
     try {
         const userData = await clienttype.find({ is_deleted: false }).sort({ createdAt: 1 })
         logger.accessLog.info("client_type fetch success")
-        res.send({ statusCode: 200, massage: "client_type fetch successfully", data: userData })
+        res.send({ statusCode: 200, message: "client_type fetch successfully", data: userData })
     }
     catch (err) {
         logger.errorLog.error("client_type fetch fail")
-        res.send({ statusCode: 500, massage: "client_type fetch fail", error: err })
+        res.send({ statusCode: 500, message: "client_type fetch fail", error: err })
     }
 }
 
@@ -65,11 +65,11 @@ exports.readClientTypeById = async (req, res) => {
         const { id } = req.params
         const userData = await clienttype.findOne({ _id: id, is_deleted: false })
         logger.accessLog.info("client_type fetch success")
-        res.send({ statusCode: 200, massage: "client_type fetch successfully", data: userData })
+        res.send({ statusCode: 200, message: "client_type fetch successfully", data: userData })
     }
     catch (err) {
         logger.errorLog.error("client_type fetch fail")
-        res.send({ statusCode: 500, massage: "client_type fetch fail", error: err })
+        res.send({ statusCode: 500, message: "client_type fetch fail", error: err })
     }
 }
 
@@ -81,12 +81,12 @@ exports.createClientType = async (req, res) => {
         if (newClientType) {
             await newClientType.save()
             logger.accessLog.info("client_type create successfully")
-            res.send({ statusCode: 200, massage: "The client type has been created successfully", clienttype: newClientType })
+            res.send({ statusCode: 200, message: "The client type has been created successfully", clienttype: newClientType })
         }
     }
     catch (err) {
         logger.errorLog.error("client_type create fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }
 
@@ -99,12 +99,12 @@ exports.updateClientType = async (req, res) => {
         if (updateClientType) {
             await updateClientType.save()
             logger.accessLog.info("client_type update successfully")
-            res.send({ statusCode: 200, massage: "The client type has been updated successfully", clienttype: updateClientType })
+            res.send({ statusCode: 200, message: "The client type has been updated successfully", clienttype: updateClientType })
         }
     }
     catch (err) {
         logger.errorLog.error("client_type update fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }
 
@@ -115,10 +115,10 @@ exports.deleteClientType = async (req, res) => {
         const { id } = req.params
         const deleteClientType = await clienttype.findByIdAndUpdate(id, { $set: { is_deleted: true } })
         logger.accessLog.info("client_type delete successfully")
-        res.send({ statusCode: 200, massage: "The client type has been deleted successfully", clienttype: deleteClientType })
+        res.send({ statusCode: 200, message: "The client type has been deleted successfully", clienttype: deleteClientType })
     }
     catch (err) {
         logger.errorLog.error("clienttype delete fail")
-        res.send({ statusCode: 500, massage: "Oops Something went wrong. Please contact the administrator", error: err })
+        res.send({ statusCode: 500, message: "Oops Something went wrong. Please contact the administrator", error: err })
     }
 }

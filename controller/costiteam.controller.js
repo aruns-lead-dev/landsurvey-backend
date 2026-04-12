@@ -46,13 +46,13 @@ exports.readCostIteam = async (req, res) => {
     logger.accessLog.info('cost item fetch fail');
     res.send({
       statusCode: 200,
-      massage: 'cost item fetch successfully',
+      message: 'cost item fetch successfully',
       total: totalDataCount,
       data: allUsers,
     });
   } catch (err) {
     logger.errorLog.error('cost item fetch fail');
-    res.send({ statusCode: 500, massage: 'cost item fetch fail', error: err });
+    res.send({ statusCode: 500, message: 'cost item fetch fail', error: err });
   }
 };
 
@@ -64,12 +64,12 @@ exports.readAllCostIteam = async (req, res) => {
     logger.accessLog.info('cost item fetch success');
     res.send({
       statusCode: 200,
-      massage: 'cost item fetch successfully',
+      message: 'cost item fetch successfully',
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error('cost item fetch fail');
-    res.send({ statusCode: 500, massage: 'cost item fetch fail', error: err });
+    res.send({ statusCode: 500, message: 'cost item fetch fail', error: err });
   }
 };
 exports.readCostIteamById = async (req, res) => {
@@ -79,12 +79,12 @@ exports.readCostIteamById = async (req, res) => {
     logger.accessLog.info('cost item fetch success');
     res.send({
       statusCode: 200,
-      massage: 'cost item fetch successfully',
+      message: 'cost item fetch successfully',
       data: userData,
     });
   } catch (err) {
     logger.errorLog.error('cost item fetch fail');
-    res.send({ statusCode: 500, massage: 'cost item fetch fail', error: err });
+    res.send({ statusCode: 500, message: 'cost item fetch fail', error: err });
   }
 };
 
@@ -96,7 +96,7 @@ exports.createCostIteam = async (req, res) => {
       logger.accessLog.info('cost item create fail');
       res.send({
         statusCode: 200,
-        massage: 'The cost item has been created successfully',
+        message: 'The cost item has been created successfully',
         costiteam: newCostIteam,
       });
     }
@@ -104,7 +104,7 @@ exports.createCostIteam = async (req, res) => {
     logger.errorLog.error('cost item create fail');
     res.send({
       statusCode: 500,
-      massage: 'Oops Something went wrong. Please contact the administrator',
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -119,7 +119,7 @@ exports.updateCostIteam = async (req, res) => {
       logger.accessLog.info('cost item update fail');
       res.send({
         statusCode: 200,
-        massage: 'The cost item has been updated successfully',
+        message: 'The cost item has been updated successfully',
         costiteam: updateCostIteam,
       });
     }
@@ -127,7 +127,7 @@ exports.updateCostIteam = async (req, res) => {
     logger.errorLog.error('cost item update fail');
     res.send({
       statusCode: 500,
-      massage: 'Oops Something went wrong. Please contact the administrator',
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -142,14 +142,14 @@ exports.deleteCostIteam = async (req, res) => {
     logger.accessLog.info('cost item delete fail');
     res.send({
       statusCode: 200,
-      massage: 'The cost item has been deleted successfully',
+      message: 'The cost item has been deleted successfully',
       costiteam: deleteCostIteam,
     });
   } catch (err) {
     logger.errorLog.error('cost item delete fail');
     res.send({
       statusCode: 500,
-      massage: 'Oops Something went wrong. Please contact the administrator',
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }

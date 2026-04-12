@@ -28,7 +28,7 @@ const ratesheetValidation = async (req, res, next) => {
 
   const { error } = validation.validate(payload, { errors: { label: 'key', wrap: { label: false } } });
   if (error) {
-    return res.json({ status: 403, massage: error.details[0].message, success: false });
+    return res.json({ status: 403, message: error.details[0].message, success: false });
   } else {
     next();
   }

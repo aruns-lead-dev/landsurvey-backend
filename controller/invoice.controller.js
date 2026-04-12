@@ -145,7 +145,7 @@ exports.readInvoice = async (req, res) => {
     logger.accessLog.info("task fetch success");
     res.send({
       statusCode: 200,
-      massage: "The invoice has been fetched successfully",
+      message: "The invoice has been fetched successfully",
       total: count,
       data: allTasks,
     });
@@ -153,7 +153,7 @@ exports.readInvoice = async (req, res) => {
     logger.errorLog.error("invoice fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the invoice",
+      message: "Failed to fetch the invoice",
       error: err,
     });
   }
@@ -231,14 +231,14 @@ exports.readTaskByClientId = async (req, res) => {
     logger.accessLog.info("client task fetch success");
     res.send({
       statusCode: 200,
-      massage: "The client task has been fetched successfully",
+      message: "The client task has been fetched successfully",
       data: allTasks,
     });
   } catch (err) {
     logger.errorLog.error("client task fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the client task",
+      message: "Failed to fetch the client task",
       error: err,
     });
   }
@@ -322,7 +322,7 @@ exports.generateInvoice = async (req, res) => {
     ) {
       return res.send({
         statusCode: 500,
-        massage:
+        message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
           "Oops Something went wrong. Please contact the administrator",
       });
@@ -359,14 +359,14 @@ exports.generateInvoice = async (req, res) => {
 
     res.send({
       statusCode: 200,
-      massage: "The invoice has been generated successfully",
+      message: "The invoice has been generated successfully",
       invoice: newInvoice,
     });
   } catch (err) {
     logger.errorLog.error("invoice create fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -455,7 +455,7 @@ exports.updateGeneratedInvoice = async (req, res) => {
     ) {
       return res.send({
         statusCode: 500,
-        massage:
+        message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
           "Oops Something went wrong. Please contact the administrator",
       });
@@ -505,14 +505,14 @@ exports.updateGeneratedInvoice = async (req, res) => {
 
     res.send({
       statusCode: 200,
-      massage: "The invoice has been Updated successfully",
+      message: "The invoice has been Updated successfully",
       invoice: newInvoice,
     });
   } catch (err) {
     logger.errorLog.error("invoice Updated fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
@@ -553,14 +553,14 @@ exports.downloadInvoice = async (req, res) => {
         console.error(e.intuit_tid);
         res.send({
           statusCode: 500,
-          massage: "Something went wrong while downloading invoice",
+          message: "Something went wrong while downloading invoice",
           error: e.originalMessage,
         });
       });
     // }
   } catch (err) {
     logger.errorLog.error("task fetch fail");
-    res.send({ statusCode: 500, massage: "task fetch fail", error: err });
+    res.send({ statusCode: 500, message: "task fetch fail", error: err });
   }
 };
 
@@ -674,14 +674,14 @@ exports.readInvoiceById = async (req, res) => {
     logger.accessLog.info("invoice fetch success");
     res.send({
       statusCode: 200,
-      massage: "The invoice has been fetched successfully",
+      message: "The invoice has been fetched successfully",
       data: invoiceData[0],
     });
   } catch (err) {
     logger.errorLog.error("invoice fetch fail");
     res.send({
       statusCode: 500,
-      massage: "Failed to fetch the invoice",
+      message: "Failed to fetch the invoice",
     });
   }
 };
@@ -706,7 +706,7 @@ exports.deleteInvoice = async (req, res) => {
     ) {
       return res.send({
         statusCode: 500,
-        massage:
+        message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
           "Oops Something went wrong. Please contact the administrator",
       });
@@ -727,14 +727,14 @@ exports.deleteInvoice = async (req, res) => {
     logger.accessLog.info("Invoice delete successfully");
     res.send({
       statusCode: 200,
-      massage: "The Invoice has been deleted successfully",
+      message: "The Invoice has been deleted successfully",
       Invoice: deleteInvoice,
     });
   } catch (err) {
     logger.errorLog.error("Invoice delete fail");
     res.send({
       statusCode: 500,
-      massage: "Oops Something went wrong. Please contact the administrator",
+      message: "Oops Something went wrong. Please contact the administrator",
       error: err,
     });
   }
