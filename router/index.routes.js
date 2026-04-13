@@ -42,6 +42,7 @@ const dwrRoute = require('./dwr.routes');
 const dwrReportsRoute = require('./reports.routes');
 const scheduleRoute = require('./schedule.routes');
 const holidayRoute = require('./holiday.routes');
+const employeeLeaveRoute = require('./employeeLeave.routes');
 const {
   exportClient,
   exportJob,
@@ -101,6 +102,7 @@ route.use('/dwr', verifyAccessToken, dwrRoute);
 route.use('/dwrreports', verifyAccessToken, dwrReportsRoute);
 route.use('/schedule', verifyAccessToken, scheduleRoute);
 route.use('/holiday', verifyAccessToken, holidayRoute);
+route.use('/employee-leave', verifyAccessToken, employeeLeaveRoute);
 route.use('/invoice', invoiceRoute);
 
 // Identifier counters

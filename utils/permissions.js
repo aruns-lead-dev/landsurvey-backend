@@ -34,6 +34,8 @@ exports.employees_permission = [
   'schedule_jobs',
   'schedule_find',
   'holiday_read',
+  'employee-leave_read',
+  'employee-leave_create',
 ];
 
 exports.manager_permission = [
@@ -180,6 +182,10 @@ exports.manager_permission = [
   'invoice_all_item',
   'invoice_one',
   'invoice_update_generated_invoice',
+  'employee-leave_read',
+  'employee-leave_create',
+  'employee-leave_update',
+  'employee-leave_delete',
 ];
 
 exports.admin_permission = [
@@ -355,4 +361,8 @@ exports.admin_permission = [
   'invoice_one',
   'invoice_update_generated_invoice',
   'invoice_delete',
+  'employee-leave_read',
+  'employee-leave_create',
+  'employee-leave_update',
+  'employee-leave_delete',
 ];
