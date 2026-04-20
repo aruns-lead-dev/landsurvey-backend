@@ -570,19 +570,29 @@ exports.createTask = async (req, res) => {
         { session }
       );
 
-      await scheduling.create(
-        [
-          {
-            task_id: newTask._id,
-            job_id: selectJob,
-            select_client_id: selectClient_id,
-            project_managers: ProjectManager
-              ? [{ manager: ProjectManager }]
-              : [],
-          },
-        ],
-        { session }
-      );
+      const schedulingDocs =
+        labourItem && labourItem.length > 0
+          ? labourItem.map((item) => ({
+              task_id: newTask._id,
+              job_id: selectJob,
+              select_client_id: selectClient_id,
+              project_managers: ProjectManager
+                ? [{ manager: ProjectManager }]
+                : [],
+              cost_item: item.costItem ? [item.costItem] : [],
+            }))
+          : [
+              {
+                task_id: newTask._id,
+                job_id: selectJob,
+                select_client_id: selectClient_id,
+                project_managers: ProjectManager
+                  ? [{ manager: ProjectManager }]
+                  : [],
+              },
+            ];
+
+      await scheduling.create(schedulingDocs, { session });
 
       await session.commitTransaction();
       session.endSession();
@@ -710,6 +720,50 @@ exports.updateTask = async (req, res) => {
     });
     if (updateTaskData) {
       await updateTaskData.save();
+
+      const newCostItems = (labourItem || [])
+        .map((item) => item.costItem)
+        .filter(Boolean);
+
+      const existingSchedulings = await scheduling.find({
+        task_id: mongooseLib.Types.ObjectId(id),
+        is_deleted: false,
+      });
+
+      const existingCostItems = existingSchedulings.map(
+        (doc) => (doc.cost_item && doc.cost_item[0]) || null
+      );
+
+      const toDelete = existingSchedulings.filter(
+        (doc) =>
+          !newCostItems.includes((doc.cost_item && doc.cost_item[0]) || null)
+      );
+
+      const toAdd = newCostItems.filter(
+        (costItem) => !existingCostItems.includes(costItem)
+      );
+
+      if (toDelete.length > 0) {
+        const deleteIds = toDelete.map((doc) => doc._id);
+        await scheduling.updateMany(
+          { _id: { $in: deleteIds } },
+          { $set: { is_deleted: true } }
+        );
+      }
+
+      if (toAdd.length > 0) {
+        const newSchedulingDocs = toAdd.map((costItem) => ({
+          task_id: updateTaskData._id,
+          job_id: selectJob,
+          select_client_id: selectClient_id,
+          project_managers: ProjectManager
+            ? [{ manager: ProjectManager }]
+            : [],
+          cost_item: [costItem],
+        }));
+        await scheduling.create(newSchedulingDocs);
+      }
+
       logger.accessLog.info("task update success");
       res.send({
         statusCode: 200,
@@ -792,6 +846,12 @@ exports.deleteTask = async (req, res) => {
     const deleteTaskData = await task.findByIdAndUpdate(id, {
       $set: { is_deleted: true },
     });
+
+    await scheduling.updateMany(
+      { task_id: mongooseLib.Types.ObjectId(id), is_deleted: false },
+      { $set: { is_deleted: true } }
+    );
+
     logger.accessLog.info("task delete success");
     res.send({
       statusCode: 200,
