@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const Task = require('./models/task'); // adjust path
 const Scheduling = require('./models/scheduling'); // adjust path
+const getLabourCostItems = require('./utils/getLabourCostItems');
 
 const MONGO_URI =
   'mongodb+srv://arunsimon2007_db_user:MpvsNnS2tUxM7WSl@cluster0.iqtw6ge.mongodb.net/land-servey-live?appName=Cluster0'; // change
@@ -10,6 +11,12 @@ async function migrate() {
   try {
     await mongoose.connect(MONGO_URI);
     console.log('✅ DB Connected');
+
+    const validCostItems = await getLabourCostItems();
+    console.log(
+      `✅ Valid cost items (${validCostItems.length}):`,
+      validCostItems,
+    );
 
     const tasks = await Task.aggregate([
       {
@@ -26,17 +33,7 @@ async function migrate() {
               input: '$billing_line_items.labour_item.labour_cost_items',
               as: 'item',
               cond: {
-                $not: {
-                  $in: [
-                    '$$item.costItem',
-                    [
-                      'CAD TECHNICIAN',
-                      'SENIOR CAD TECHNICIAN',
-                      'BC LAND SURVEYOR',
-                      'Drone Office Technician',
-                    ],
-                  ],
-                },
+                $in: ['$$item.costItem', validCostItems],
               },
             },
           },
@@ -58,9 +55,11 @@ async function migrate() {
           task_scope: '$task_scope_id',
           cost_item:
             '$billing_line_items.labour_item.labour_cost_items.costItem',
+          cost_uuid:
+            '$billing_line_items.labour_item.labour_cost_items.uuid',
           group_number: '0',
           sequence_number: '0',
-          planned_date: '',
+          planned_date: null,
           assigned_members: [],
           comments: [],
           status: 'open',
@@ -100,6 +99,7 @@ async function migrate() {
         sequence_number: 0, // default
         planned_date: null,
         cost_item: task.cost_item ? [task.cost_item] : [],
+        cost_uuid: task.cost_uuid || null,
         assigned_members: [],
         comments: [],
         status: 'open',

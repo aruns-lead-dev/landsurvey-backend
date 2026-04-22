@@ -37,6 +37,11 @@ let scheduling = mongoose.Schema(
       default: [],
       index: true,
     },
+    cost_uuid: {
+      type: String,
+      default: null,
+      index: true,
+    },
     group_number: {
       type: Number,
       default: null,

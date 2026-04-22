@@ -26,6 +26,7 @@ const scheduling = require("../models/scheduling");
 
 const { default: axios } = require("axios");
 const { startOfDay, endOfDay } = require("date-fns");
+const getLabourCostItems = require("../utils/getLabourCostItems");
 
 exports.TaskInitalData = async (req, res) => {
   try {
@@ -570,29 +571,28 @@ exports.createTask = async (req, res) => {
         { session }
       );
 
-      const schedulingDocs =
-        labourItem && labourItem.length > 0
-          ? labourItem.map((item) => ({
-              task_id: newTask._id,
-              job_id: selectJob,
-              select_client_id: selectClient_id,
-              project_managers: ProjectManager
-                ? [{ manager: ProjectManager }]
-                : [],
-              cost_item: item.costItem ? [item.costItem] : [],
-            }))
-          : [
-              {
-                task_id: newTask._id,
-                job_id: selectJob,
-                select_client_id: selectClient_id,
-                project_managers: ProjectManager
-                  ? [{ manager: ProjectManager }]
-                  : [],
-              },
-            ];
+      const validCostItems = await getLabourCostItems();
+      const filteredLabourItems = (labourItem || []).filter(
+        (item) => item.costItem && validCostItems.includes(item.costItem)
+      );
 
-      await scheduling.create(schedulingDocs, { session });
+      if (filteredLabourItems.length > 0) {
+        const schedulingDocs = filteredLabourItems.map((item) => ({
+          task_id: newTask._id,
+          job_id: selectJob,
+          select_client_id: selectClient_id,
+          project_managers: ProjectManager
+            ? [{ manager: ProjectManager }]
+            : [],
+          cost_item: [item.costItem],
+          cost_uuid: item.uuid || null,
+          task_scope_id: TaskScope || null,
+          estimated_hours: item.estimated_hour
+            ? parseFloat(item.estimated_hour)
+            : null,
+        }));
+        await scheduling.create(schedulingDocs, { session });
+      }
 
       await session.commitTransaction();
       session.endSession();
@@ -721,9 +721,10 @@ exports.updateTask = async (req, res) => {
     if (updateTaskData) {
       await updateTaskData.save();
 
+      const validCostItems = await getLabourCostItems();
       const newCostItems = (labourItem || [])
         .map((item) => item.costItem)
-        .filter(Boolean);
+        .filter((c) => c && validCostItems.includes(c));
 
       const existingSchedulings = await scheduling.find({
         task_id: mongooseLib.Types.ObjectId(id),
@@ -751,16 +752,45 @@ exports.updateTask = async (req, res) => {
         );
       }
 
+      const existingToKeep = existingSchedulings.filter(
+        (doc) =>
+          newCostItems.includes((doc.cost_item && doc.cost_item[0]) || null)
+      );
+      for (const doc of existingToKeep) {
+        const matchedItem = (labourItem || []).find(
+          (item) => item.costItem === (doc.cost_item && doc.cost_item[0])
+        );
+        await scheduling.findByIdAndUpdate(doc._id, {
+          $set: {
+            task_scope_id: TaskScope || null,
+            cost_uuid: matchedItem?.uuid || null,
+            estimated_hours: matchedItem?.estimated_hour
+              ? parseFloat(matchedItem.estimated_hour)
+              : null,
+          },
+        });
+      }
+
       if (toAdd.length > 0) {
-        const newSchedulingDocs = toAdd.map((costItem) => ({
-          task_id: updateTaskData._id,
-          job_id: selectJob,
-          select_client_id: selectClient_id,
-          project_managers: ProjectManager
-            ? [{ manager: ProjectManager }]
-            : [],
-          cost_item: [costItem],
-        }));
+        const newSchedulingDocs = toAdd.map((costItemId) => {
+          const matchedItem = (labourItem || []).find(
+            (item) => item.costItem === costItemId
+          );
+          return {
+            task_id: updateTaskData._id,
+            job_id: selectJob,
+            select_client_id: selectClient_id,
+            project_managers: ProjectManager
+              ? [{ manager: ProjectManager }]
+              : [],
+            cost_item: [costItemId],
+            cost_uuid: matchedItem?.uuid || null,
+            task_scope_id: TaskScope || null,
+            estimated_hours: matchedItem?.estimated_hour
+              ? parseFloat(matchedItem.estimated_hour)
+              : null,
+          };
+        });
         await scheduling.create(newSchedulingDocs);
       }
 
