@@ -100,6 +100,11 @@ exports.STATE_PIPELINE = [
 ];
 
 exports.CLIENT_PIPELINE = [
+  // {
+  //   '$sort': {
+  //     'createdAt': -1
+  //   }
+  // },
   {
     $lookup: {
       from: 'payment_terms',
@@ -122,6 +127,8 @@ exports.CLIENT_PIPELINE = [
   {
     $lookup: {
       from: 'client_contacts',
+      // localField: "_id",
+      // foreignField: "client_id",
       let: { client_id: '$_id' },
       pipeline: [
         {
@@ -141,6 +148,8 @@ exports.CLIENT_PIPELINE = [
   {
     $lookup: {
       from: 'client_locations',
+      // localField: "_id",
+      // foreignField: "client_id",
       let: { client_id: '$_id' },
       pipeline: [
         {
@@ -158,6 +167,80 @@ exports.CLIENT_PIPELINE = [
     },
   },
   {
+    $lookup: {
+      from: 'tasks',
+      // localField: "_id",
+      // foreignField: "client_id",
+      let: { client_id: '$_id' },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ['$select_client_id', '$$client_id'] },
+                { $eq: ['$is_completed', 0] },
+                { $eq: ['$is_deleted', false] }, // Exclude deleted ratesheets
+              ],
+            },
+          },
+        },
+      ],
+      as: 'taskscount',
+    },
+  },
+  //  {
+  //   '$lookup': {
+  //     'from': 'jobs',
+  //     'localField': '_id',
+  //     'foreignField': 'client_id',
+  //     'pipeline': [
+  //       {
+  //         '$project': {
+  //           'name': '$client_project',
+  //           'order_date': '$order_date',
+  //           'due_date': '$due_date',
+  //           'status': '$status',
+  //           'job_number': '$number'
+  //         }
+  //       }
+  //     ],
+  //     'as': 'jobs'
+  //   }
+  // },
+  // {
+  // $lookup: {
+  //   from: "jobs",
+  //   let: { clientId: "$_id" },
+  //   pipeline: [
+  //     {
+  //       $lookup: {
+  //         from: "tasks",
+  //         let: { jobId: "$number_str", clientId: "$$clientId" },
+  //         pipeline: [
+  //           {
+  //             $match: {
+  //               $expr: {
+  //                 $and: [
+  //                   { $eq: ["$job_id", "$$jobId"] },
+  //                   { $eq: ["$select_client_id", "$$clientId"] }
+  //                 ]
+  //               }
+  //             }
+  //           }
+  //         ],
+  //         as: "related_tasks"
+  //       }
+  //     },
+  //     {
+  //       $match: {
+  //         $expr: { $gt: [{ $size: "$related_tasks" }, 0] } // keep only jobs with related tasks
+  //       }
+  //     }
+  //   ],
+  //   as: "jobs"
+  // }
+  // },
+  {
     $project: {
       client_number: '$number_str',
       client_num: '$number',
@@ -166,11 +249,15 @@ exports.CLIENT_PIPELINE = [
       remark: '$remark',
       active: '$active',
       client_type: '$client_type',
+      // 'rate_sheet': '$rate_sheet',
+      // 'rate_sheet_id': '$rate_sheet._id',
       payment_terms: '$payment_terms.name',
+      // jobs: '$jobs',
       locations: '$locations',
       contacts: '$contacts',
       attachments: '$attachments',
       qb_customer_id: '$qb_customer_id',
+      tasksdata: '$taskscount',
       SyncToken: '$SyncToken',
       createdAt: {
         $dateToString: {
@@ -625,6 +712,20 @@ exports.QUOTE_TASK_PIPELINE = [
 ];
 
 exports.JOB_PIPELINE = [
+  // {
+  //   '$sort': {
+  //     'createdAt': -1
+  //   }
+  // },
+
+  // {
+  //   '$lookup': {
+  //     'from': 'tasks',
+  //     'localField': 'number_str',
+  //     'foreignField': 'job_id',
+  //     'as': 'tasks'
+  //   }
+  // },
   {
     $lookup: {
       from: 'tasks',
@@ -649,9 +750,22 @@ exports.JOB_PIPELINE = [
       as: 'tasks',
     },
   },
+  // {
+  //   '$lookup': {
+  //     'from': 'clients',
+  //     'localField': 'client_id',
+  //     'foreignField': '_id',
+  //     'as': 'clientdata'
+  //   }
+  // },
+  // {
+  //   '$unwind': '$clientdata'
+  // },
   {
     $lookup: {
       from: 'job_statuses',
+      // localField: "status_id",
+      // foreignField: "_id",
       let: { status_id: '$status_id' },
       pipeline: [
         {
@@ -732,7 +846,10 @@ exports.QUOTE_PIPELINE = [
     },
   },
   {
-    $unwind: '$client_id',
+    $unwind: {
+      path: '$client_id',
+      preserveNullAndEmptyArrays: true, // Include documents without a client_id match
+    },
   },
   {
     $lookup: {
@@ -812,6 +929,8 @@ exports.DWR_PIPELINE = [
   {
     $lookup: {
       from: 'tasks',
+      // localField: "task_id",
+      // foreignField: "_id",
       let: { task_id: '$task_id' },
       pipeline: [
         {
@@ -833,7 +952,29 @@ exports.DWR_PIPELINE = [
   },
   {
     $lookup: {
+      from: 'dwrs', // collection name for DWRs
+      let: { taskId: '$taskdata._id' },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ['$task_id', '$$taskId'] },
+                { $eq: ['$is_deleted', false] },
+              ],
+            },
+          },
+        },
+        { $sort: { createdAt: -1 } }, // optional: sort by created date
+      ],
+      as: 'allDwrForTask',
+    },
+  },
+  {
+    $lookup: {
       from: 'users',
+      // localField: "taskdata.project_manager",
+      // foreignField: "_id",
       let: { taskData: '$taskdata.project_manager' },
       pipeline: [
         {
@@ -853,6 +994,8 @@ exports.DWR_PIPELINE = [
   {
     $lookup: {
       from: 'users',
+      // localField: "taskdata.project_manager",
+      // foreignField: "_id",
       let: { projectManager: '$taskdata.project_manager' },
       pipeline: [
         {
@@ -873,6 +1016,8 @@ exports.DWR_PIPELINE = [
   {
     $lookup: {
       from: 'users',
+      // localField: "user_id",
+      // foreignField: "_id",
       let: { user_id: '$user_id' },
       pipeline: [
         {
@@ -895,6 +1040,8 @@ exports.DWR_PIPELINE = [
   {
     $lookup: {
       from: 'jobs',
+      // localField: "taskdata.job_id",
+      // foreignField: "number_str",
       let: { jobId: '$taskdata.job_id' },
       pipeline: [
         {
@@ -944,6 +1091,7 @@ exports.DWR_PIPELINE = [
       taskdata: '$taskdata',
       createdAt: '$createdAt',
       is_deleted: '$is_deleted',
+      allDwrForTask: 1,
     },
   },
 ];
@@ -1040,6 +1188,70 @@ exports.TOKEN_PIPELINE = [
   {
     $sort: {
       number: -1,
+    },
+  },
+];
+
+exports.CLIENT_TASK_PIPELINE = (clientObjectId) => [
+  // Match tasks for this client
+  {
+    $match: {
+      select_client_id: clientObjectId, // already an ObjectId
+      is_deleted: false,
+    },
+  },
+  // Lookup the related job for each task
+  {
+    $lookup: {
+      from: 'jobs',
+      let: { taskJobId: '$job_id' },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ['$number_str', '$$taskJobId'] },
+                { $eq: ['$is_deleted', false] },
+              ],
+            },
+          },
+        },
+      ],
+      as: 'job',
+    },
+  },
+  {
+    $unwind: {
+      path: '$job',
+      preserveNullAndEmptyArrays: true, // task may exist without job
+    },
+  },
+  // Group by job to remove duplicates
+  {
+    $group: {
+      _id: '$job._id',
+      job_number: { $first: '$job.number_str' },
+      job_status: { $first: '$job.status' },
+      job_locations: { $first: '$job.locations' },
+      tasks: {
+        $push: {
+          task_number: '$number_str',
+          task_name: '$name',
+          task_status: '$status',
+          createdAt: '$createdAt',
+          updatedAt: '$updatedAt',
+        },
+      },
+    },
+  },
+  // Optional: project final shape
+  {
+    $project: {
+      job_id: '$_id',
+      job_number: 1,
+      job_status: 1,
+      job_locations: 1,
+      tasks: 1,
     },
   },
 ];

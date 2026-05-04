@@ -1,29 +1,29 @@
-const { mongoose } = require("mongoose");
-const logger = require("../middleware/logger");
-const Jimp = require("jimp");
+const { mongoose } = require('mongoose');
+const logger = require('../middleware/logger');
+const Jimp = require('jimp');
 const {
   TASK_PIPELINE,
   INVOICE_PIPELINE,
   TOKEN_PIPELINE,
   QUOTE_TASK_PIPELINE,
-} = require("../middleware/pipelines");
-const task = require("../models/task");
-const { axios } = require("axios");
-const OAuthClient = require("intuit-oauth");
-const invoice = require("../models/invoice");
-const fs = require("fs");
-const { Readable } = require("stream");
-const { finished } = require("stream/promises");
-const path = require("path");
-const quickbook = require("../models/quickbook");
-const fetch = require("node-fetch");
-var crypto = require("crypto");
-const client = require("../models/client");
-const QuickBooksHelper = require("../utils/quickbooksHelper");
-const invoiceitems = require("../models/invoiceitems");
-const taxcodes = require("../models/taxcodes");
+} = require('../middleware/pipelines');
+const task = require('../models/task');
+const { axios } = require('axios');
+const OAuthClient = require('intuit-oauth');
+const invoice = require('../models/invoice');
+const fs = require('fs');
+const { Readable } = require('stream');
+const { finished } = require('stream/promises');
+const path = require('path');
+const quickbook = require('../models/quickbook');
+const fetch = require('node-fetch');
+var crypto = require('crypto');
+const client = require('../models/client');
+const QuickBooksHelper = require('../utils/quickbooksHelper');
+const invoiceitems = require('../models/invoiceitems');
+const taxcodes = require('../models/taxcodes');
 
-const isProduction = process.env.QB_IS_PRODUCTION === "1";
+const isProduction = process.env.QB_IS_PRODUCTION === '1';
 
 // Load environment variables based on the environment
 const QB_CONFIG = {
@@ -52,7 +52,7 @@ exports.readInvoice = async (req, res) => {
     var page = req.query.page;
     var per_page = req.query.per_page;
     var search = req.query.search;
-    var sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    var sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     var user_id = req.query.user_id;
 
     var myMatch = {
@@ -61,23 +61,22 @@ exports.readInvoice = async (req, res) => {
     };
 
     if (page === undefined) {
-      page = "1";
+      page = '1';
     }
     if (per_page === undefined) {
       per_page = process.env.PAGINATION;
     }
-    if (user_id && user_id !== "All_Manager") {
+    if (user_id && user_id !== 'All_Manager') {
       myMatch.project_managers = mongoose.Types.ObjectId(user_id);
     }
     const data = page * per_page - per_page;
-    if (search === "") {
-
+    if (search === '') {
       const totalDataCount = await invoice.aggregate([
-        ...INVOICE_PIPELINE, // Existing pipeline
+        ...INVOICE_PIPELINE,
         {
           $match: myMatch,
         },
-        { $count: "total" },
+        { $count: 'total' },
       ]);
 
       var count = totalDataCount.length > 0 ? totalDataCount[0].total : 0;
@@ -91,18 +90,17 @@ exports.readInvoice = async (req, res) => {
         { $skip: parseInt(data) },
         { $limit: parseInt(per_page) },
       ]);
-
     } else {
       const totalDataCount = await invoice.aggregate([
         ...INVOICE_PIPELINE, // Existing pipeline
         {
           $match: {
             ...myMatch,
-            $or: [{ number_str: { $regex: search, $options: "i" } }], // Case-insensitive search
+            $or: [{ number_str: { $regex: search, $options: 'i' } }], // Case-insensitive search
           },
         },
         {
-          $count: "total",
+          $count: 'total',
         },
       ]);
 
@@ -119,17 +117,17 @@ exports.readInvoice = async (req, res) => {
                   { number_str: { $regex: search } },
                   { doc_number: { $regex: search } },
                   {
-                    "client_id.company_name": { $regex: search, $options: "i" },
+                    'client_id.company_name': { $regex: search, $options: 'i' },
                   },
                   {
                     task_details: {
                       $elemMatch: {
-                        number_str: { $regex: search, $options: "i" },
+                        number_str: { $regex: search, $options: 'i' },
                       },
                     },
                   },
                   {
-                    "job_details.number_str": { $regex: search, $options: "i" },
+                    'job_details.number_str': { $regex: search, $options: 'i' },
                   },
                 ],
               },
@@ -142,18 +140,18 @@ exports.readInvoice = async (req, res) => {
       ]);
     }
 
-    logger.accessLog.info("task fetch success");
+    logger.accessLog.info('task fetch success');
     res.send({
       statusCode: 200,
-      message: "The invoice has been fetched successfully",
+      message: 'The invoice has been fetched successfully',
       total: count,
       data: allTasks,
     });
   } catch (err) {
-    logger.errorLog.error("invoice fetch fail");
+    logger.errorLog.error('invoice fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the invoice",
+      message: 'Failed to fetch the invoice',
       error: err,
     });
   }
@@ -168,13 +166,13 @@ exports.invoicePaymentReceived = async (req, res) => {
     });
 
     res.status(200).json({
-      message: "Invoice payment status updated successfully",
+      message: 'Invoice payment status updated successfully',
     });
   } catch (error) {
-    console.error("Error updating invoice:", error);
+    console.error('Error updating invoice:', error);
     res
       .status(500)
-      .json({ error: "An error occurred while updating the invoice" });
+      .json({ error: 'An error occurred while updating the invoice' });
   }
 };
 
@@ -186,7 +184,7 @@ exports.readTaskByClientId = async (req, res) => {
     var user_id = req.query.user_id;
     var task_id = req.query.taskId;
     if (page === undefined) {
-      page = "1";
+      page = '1';
     }
     if (per_page === undefined) {
       per_page = process.env.PAGINATION;
@@ -214,7 +212,7 @@ exports.readTaskByClientId = async (req, res) => {
       { $limit: parseInt(per_page) },
       ...TASK_PIPELINE,
     ]);
-    if (task_id && task_id !== "undefined") {
+    if (task_id && task_id !== 'undefined') {
       mySelectdMatch._id = mongoose.Types.ObjectId(task_id);
       selectedTaskWithoutQoute = await task.aggregate([
         {
@@ -228,17 +226,17 @@ exports.readTaskByClientId = async (req, res) => {
     }
     var allTasks = [...allTasksWithoutQoute, ...selectedTaskWithoutQoute];
 
-    logger.accessLog.info("client task fetch success");
+    logger.accessLog.info('client task fetch success');
     res.send({
       statusCode: 200,
-      message: "The client task has been fetched successfully",
+      message: 'The client task has been fetched successfully',
       data: allTasks,
     });
   } catch (err) {
-    logger.errorLog.error("client task fetch fail");
+    logger.errorLog.error('client task fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the client task",
+      message: 'Failed to fetch the client task',
       error: err,
     });
   }
@@ -258,11 +256,11 @@ exports.generateInvoice = async (req, res) => {
       taxCodeRef,
     } = req.body;
     const todayDate = new Date();
-    const formattedDate = new Intl.DateTimeFormat("en-CA").format(todayDate);
+    const formattedDate = new Intl.DateTimeFormat('en-CA').format(todayDate);
     const LineItems = labourCosts?.map((i) => {
       const labCost = {
-        Description: i.description ? i.description : "",
-        DetailType: "SalesItemLineDetail",
+        Description: i.description ? i.description : '',
+        DetailType: 'SalesItemLineDetail',
         SalesItemLineDetail: {
           Qty: i.dwr_hours,
           UnitPrice: i.unit_cost,
@@ -301,19 +299,19 @@ exports.generateInvoice = async (req, res) => {
     }
 
     const hasTax = LineItems.some(
-      (item) => item.SalesItemLineDetail.TaxCodeRef.value === "TAX"
+      (item) => item.SalesItemLineDetail.TaxCodeRef.value === 'TAX',
     );
     if (hasTax) {
       body.TxnTaxDetail = {
         TxnTaxCodeRef: {
-          value: taxCodeRef || "4",
+          value: taxCodeRef || '4',
         },
       };
     }
     const apiUrl = `${QB_CONFIG.baseUrl}/invoice`;
     const response = await QuickBooksHelper.makeQuickBooksApiPostCall(
       apiUrl,
-      body
+      body,
     );
     if (
       response.Fault &&
@@ -324,7 +322,7 @@ exports.generateInvoice = async (req, res) => {
         statusCode: 500,
         message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
-          "Oops Something went wrong. Please contact the administrator",
+          'Oops Something went wrong. Please contact the administrator',
       });
     }
 
@@ -344,12 +342,12 @@ exports.generateInvoice = async (req, res) => {
     });
     await invoice.findByIdAndUpdate(newInvoice._id, {
       $set: {
-        number_str: newInvoice.number.toString().padStart(6, "0"),
+        number_str: newInvoice.number.toString().padStart(6, '0'),
       },
     });
 
     newInvoice.save();
-    logger.accessLog.info("Invoice create success");
+    logger.accessLog.info('Invoice create success');
 
     // update task as invoice generated
     const isUpdate = await task.findByIdAndUpdate(taskIds, {
@@ -359,14 +357,14 @@ exports.generateInvoice = async (req, res) => {
 
     res.send({
       statusCode: 200,
-      message: "The invoice has been generated successfully",
+      message: 'The invoice has been generated successfully',
       invoice: newInvoice,
     });
   } catch (err) {
-    logger.errorLog.error("invoice create fail");
+    logger.errorLog.error('invoice create fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -391,8 +389,8 @@ exports.updateGeneratedInvoice = async (req, res) => {
 
     const LineItems = labourCosts?.map((i) => {
       const labCost = {
-        Description: i.description ? i.description : "",
-        DetailType: "SalesItemLineDetail",
+        Description: i.description ? i.description : '',
+        DetailType: 'SalesItemLineDetail',
         SalesItemLineDetail: {
           Qty: i.dwr_hours,
           UnitPrice: i.unit_cost,
@@ -431,22 +429,21 @@ exports.updateGeneratedInvoice = async (req, res) => {
       };
     }
     const hasTax = LineItems.some(
-      (item) => item.SalesItemLineDetail.TaxCodeRef.value === "3"
+      (item) => item.SalesItemLineDetail.TaxCodeRef.value === '3',
     );
 
     if (hasTax) {
       body.TxnTaxDetail = {
         TxnTaxCodeRef: {
-          value: taxCodeRef || "4",
+          value: taxCodeRef || '4',
         },
       };
     }
 
-
     const apiUrl = `${QB_CONFIG.baseUrl}/invoice?minorversion=69`;
     const response = await QuickBooksHelper.makeQuickBooksApiPostCall(
       apiUrl,
-      body
+      body,
     );
     if (
       response.Fault &&
@@ -457,12 +454,12 @@ exports.updateGeneratedInvoice = async (req, res) => {
         statusCode: 500,
         message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
-          "Oops Something went wrong. Please contact the administrator",
+          'Oops Something went wrong. Please contact the administrator',
       });
     }
     // update task as invoice generated
     const invoiceData = await invoice.findById(
-      mongoose.Types.ObjectId(invoice_id)
+      mongoose.Types.ObjectId(invoice_id),
     );
 
     const newInvoice = await invoice.findByIdAndUpdate(
@@ -482,11 +479,11 @@ exports.updateGeneratedInvoice = async (req, res) => {
           TxnDate: response?.Invoice?.TxnDate,
           qb_response: response?.Invoice,
         },
-      }
+      },
     );
 
     newInvoice.save();
-    logger.accessLog.info("Invoice Updated success");
+    logger.accessLog.info('Invoice Updated success');
 
     if (!invoiceData.task_ids.equals(new mongoose.Types.ObjectId(taskIds))) {
       await task.findOneAndUpdate(
@@ -494,7 +491,7 @@ exports.updateGeneratedInvoice = async (req, res) => {
         {
           is_invoice_generated: 0,
           invoice_id: null,
-        }
+        },
       );
 
       const isUpdate = await task.findByIdAndUpdate(taskIds, {
@@ -505,14 +502,14 @@ exports.updateGeneratedInvoice = async (req, res) => {
 
     res.send({
       statusCode: 200,
-      message: "The invoice has been Updated successfully",
+      message: 'The invoice has been Updated successfully',
       invoice: newInvoice,
     });
   } catch (err) {
-    logger.errorLog.error("invoice Updated fail");
+    logger.errorLog.error('invoice Updated fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -521,46 +518,46 @@ exports.updateGeneratedInvoice = async (req, res) => {
 exports.downloadInvoice = async (req, res) => {
   try {
     const { qb_invoice_id } = req.params;
-    const fileName = qb_invoice_id + ".pdf";
-    const destination = path.resolve("./public/invoice_pdf/", fileName);
+    const fileName = qb_invoice_id + '.pdf';
+    const destination = path.resolve('./public/invoice_pdf/', fileName);
     var resToken = await QuickBooksHelper.getQuickBooksToken();
     const url = `${QB_CONFIG.baseUrl}/invoice/${qb_invoice_id}/pdf`;
     await fetch(url, {
-      method: "GET",
+      method: 'GET',
       withCredentials: true,
-      credentials: "include",
-      headers: { Authorization: "Bearer " + resToken.access_token },
+      credentials: 'include',
+      headers: { Authorization: 'Bearer ' + resToken.access_token },
     })
       .then(async function (response) {
         const fileStream = fs.createWriteStream(destination, {
-          flags: "w",
+          flags: 'w',
         });
         await new Promise((resolve, reject) => {
           response.body.pipe(fileStream);
-          response.body.on("error", reject);
-          fileStream.on("finish", resolve);
+          response.body.on('error', reject);
+          fileStream.on('finish', resolve);
         });
         // }
-        var file = fs.createReadStream("./public/invoice_pdf/" + fileName);
-        var stat = fs.statSync("./public/invoice_pdf/" + fileName);
-        res.setHeader("Content-Length", stat.size);
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "attachment; filename=quote.pdf");
+        var file = fs.createReadStream('./public/invoice_pdf/' + fileName);
+        var stat = fs.statSync('./public/invoice_pdf/' + fileName);
+        res.setHeader('Content-Length', stat.size);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=quote.pdf');
         file.pipe(res);
       })
       .catch((e) => {
-        console.error("The error message is :" + e.originalMessage);
+        console.error('The error message is :' + e.originalMessage);
         console.error(e.intuit_tid);
         res.send({
           statusCode: 500,
-          message: "Something went wrong while downloading invoice",
+          message: 'Something went wrong while downloading invoice',
           error: e.originalMessage,
         });
       });
     // }
   } catch (err) {
-    logger.errorLog.error("task fetch fail");
-    res.send({ statusCode: 500, message: "task fetch fail", error: err });
+    logger.errorLog.error('task fetch fail');
+    res.send({ statusCode: 500, message: 'task fetch fail', error: err });
   }
 };
 
@@ -579,7 +576,7 @@ async function generateLineItems(taskIdsArr) {
     item?.billing_line_items?.labour_item?.labour_cost_items?.map((i) => {
       const labCost = {
         Description: i.costItem,
-        DetailType: "SalesItemLineDetail",
+        DetailType: 'SalesItemLineDetail',
         SalesItemLineDetail: {
           Qty: i.estimated_hour,
           UnitPrice: i.unitCost,
@@ -588,7 +585,6 @@ async function generateLineItems(taskIdsArr) {
       };
       LineItems.push(labCost);
     });
-
   });
 
   return LineItems;
@@ -601,28 +597,26 @@ exports.getInvoiceItem = async (req, res) => {
       { $match: { is_deleted: false } },
     ]);
 
-
-    // API URL for QuickBooks queries
+    // // API URL for QuickBooks queries
     const apiUrl = `${QB_CONFIG.baseUrl}/query?minorversion=72`;
 
-
-    // Fetch tax codes and tax rates in parallel to improve performance
+    // // Fetch tax codes and tax rates in parallel to improve performance
     const [taxCodesResponse, taxRatesResponse] = await Promise.all([
       QuickBooksHelper.makeQuickBooksApiPostCall(
         apiUrl,
-        "",
-        "text",
-        "select * from taxcode startposition 1 maxresults 50"
+        '',
+        'text',
+        'select * from taxcode startposition 1 maxresults 50',
       ),
       QuickBooksHelper.makeQuickBooksApiPostCall(
         apiUrl,
-        "",
-        "text",
-        "select * from taxrate startposition 1 maxresults 50"
+        '',
+        'text',
+        'select * from taxrate startposition 1 maxresults 50',
       ),
     ]);
 
-    // Extract data from responses
+    // // Extract data from responses
     const TAX_CODES_LIST = taxCodesResponse?.QueryResponse?.TaxCode || [];
     const TAX_RATES_LIST = taxRatesResponse?.QueryResponse?.TaxRate || [];
 
@@ -631,7 +625,7 @@ exports.getInvoiceItem = async (req, res) => {
       let sum = 0;
       taxObj?.SalesTaxRateList?.TaxRateDetail.forEach((detail, index) => {
         const matchingRate = TAX_RATES_LIST.find(
-          (rate) => rate.Id === detail.TaxRateRef?.value
+          (rate) => rate.Id === detail.TaxRateRef?.value,
         );
         if (matchingRate) {
           sum = sum + matchingRate.RateValue;
@@ -645,16 +639,16 @@ exports.getInvoiceItem = async (req, res) => {
     // Send success response
     res.status(200).json({
       statusCode: 200,
-      message: "Invoice items fetched successfully",
+      message: 'Invoice items fetched successfully',
       ITEM_LIST,
       TAX_CODES_LIST,
     });
   } catch (err) {
-    console.error("Invoice fetch failed:", err);
+    console.error('Invoice fetch failed:', err);
 
     res.status(500).json({
       statusCode: 500,
-      message: "Failed to fetch the invoice",
+      message: 'Failed to fetch the invoice',
       error: err.message,
     });
   }
@@ -671,17 +665,17 @@ exports.readInvoiceById = async (req, res) => {
       },
       ...INVOICE_PIPELINE,
     ]);
-    logger.accessLog.info("invoice fetch success");
+    logger.accessLog.info('invoice fetch success');
     res.send({
       statusCode: 200,
-      message: "The invoice has been fetched successfully",
+      message: 'The invoice has been fetched successfully',
       data: invoiceData[0],
     });
   } catch (err) {
-    logger.errorLog.error("invoice fetch fail");
+    logger.errorLog.error('invoice fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the invoice",
+      message: 'Failed to fetch the invoice',
     });
   }
 };
@@ -697,7 +691,7 @@ exports.deleteInvoice = async (req, res) => {
     const apiUrl = `${QB_CONFIG.baseUrl}/invoice?operation=delete`;
     const response = await QuickBooksHelper.makeQuickBooksApiPostCall(
       apiUrl,
-      body
+      body,
     );
     if (
       response.Fault &&
@@ -708,7 +702,7 @@ exports.deleteInvoice = async (req, res) => {
         statusCode: 500,
         message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
-          "Oops Something went wrong. Please contact the administrator",
+          'Oops Something went wrong. Please contact the administrator',
       });
     }
 
@@ -721,20 +715,20 @@ exports.deleteInvoice = async (req, res) => {
       {
         is_invoice_generated: 0,
         invoice_id: null,
-      }
+      },
     );
 
-    logger.accessLog.info("Invoice delete successfully");
+    logger.accessLog.info('Invoice delete successfully');
     res.send({
       statusCode: 200,
-      message: "The Invoice has been deleted successfully",
+      message: 'The Invoice has been deleted successfully',
       Invoice: deleteInvoice,
     });
   } catch (err) {
-    logger.errorLog.error("Invoice delete fail");
+    logger.errorLog.error('Invoice delete fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }

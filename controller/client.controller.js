@@ -1,27 +1,44 @@
-const logger = require("../middleware/logger");
-const client = require("../models/client");
-const Jimp = require("jimp");
-const clientlocation = require("../models/clientlocation");
-const clientcontact = require("../models/clientcontact");
-const clientattchment = require("../models/clientattchment");
-const mongoose = require("mongoose");
-const { CLIENT_PIPELINE, TOKEN_PIPELINE } = require("../middleware/pipelines");
-const { default: axios } = require("axios");
-const OAuthClient = require("intuit-oauth");
-const quickbook = require("../models/quickbook");
-const QuickBooksHelper = require("../utils/quickbooksHelper");
-const getSubdivisionCodeWithoutCountry = require("../utils/getStateCode");
+const logger = require('../middleware/logger');
+const client = require('../models/client');
+const task = require('../models/task');
+const Jimp = require('jimp');
+const clientlocation = require('../models/clientlocation');
+const clientcontact = require('../models/clientcontact');
+const clientattchment = require('../models/clientattchment');
+const mongoose = require('mongoose');
+const {
+  CLIENT_PIPELINE,
+  TOKEN_PIPELINE,
+  CLIENT_TASK_PIPELINE,
+} = require('../middleware/pipelines');
+const { default: axios } = require('axios');
+const OAuthClient = require('intuit-oauth');
+const quickbook = require('../models/quickbook');
+const QuickBooksHelper = require('../utils/quickbooksHelper');
+const getSubdivisionCodeWithoutCountry = require('../utils/getStateCode');
 
 const isProduction = process.env.QB_IS_PRODUCTION === '1';
 
 // Load environment variables based on the environment
 const QB_CONFIG = {
-  clientId: isProduction ? process.env.QB_CLIENTID_PRODUCTION : process.env.QB_CLIENTID,
-  clientSecret: isProduction ? process.env.QB_CLIENTSECRET_PRODUCTION : process.env.QB_CLIENTSECRET,
-  environment: isProduction ? process.env.QB_ENVIRONMENT_PRODUCTION : process.env.QB_ENVIRONMENT,
-  redirectUri: isProduction ? process.env.QB_REDIRECTURI_PRODUCTION : process.env.QB_REDIRECTURI,
-  companyId: isProduction ? process.env.QB_COMPANYID_PRODUCTION : process.env.QB_COMPANYID,
-  baseUrl: isProduction ? process.env.QB_BASE_URL_PRODUCTION : process.env.QB_BASE_URL,
+  clientId: isProduction
+    ? process.env.QB_CLIENTID_PRODUCTION
+    : process.env.QB_CLIENTID,
+  clientSecret: isProduction
+    ? process.env.QB_CLIENTSECRET_PRODUCTION
+    : process.env.QB_CLIENTSECRET,
+  environment: isProduction
+    ? process.env.QB_ENVIRONMENT_PRODUCTION
+    : process.env.QB_ENVIRONMENT,
+  redirectUri: isProduction
+    ? process.env.QB_REDIRECTURI_PRODUCTION
+    : process.env.QB_REDIRECTURI,
+  companyId: isProduction
+    ? process.env.QB_COMPANYID_PRODUCTION
+    : process.env.QB_COMPANYID,
+  baseUrl: isProduction
+    ? process.env.QB_BASE_URL_PRODUCTION
+    : process.env.QB_BASE_URL,
 };
 
 exports.readClients = async (req, res) => {
@@ -29,19 +46,20 @@ exports.readClients = async (req, res) => {
     var page = req.query.page;
     var per_page = req.query.per_page;
     var search = req.query.search;
-    var sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    var sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     if (page === undefined) {
-      page = "1";
+      page = '1';
     }
     if (per_page === undefined) {
       per_page = process.env.PAGINATION;
     }
     const data = page * per_page - per_page;
-    if (search === "") {
+    if (search === '') {
       var totalDataCount = await client.countDocuments({ is_deleted: false });
       var allClients = await client.aggregate([
         { $match: { is_deleted: false } },
         { $sort: { createdAt: sortOrder } },
+        // { $sort: { company_name: 1 } },
         { $skip: parseInt(data) },
         { $limit: parseInt(per_page) },
         ...CLIENT_PIPELINE,
@@ -52,8 +70,9 @@ exports.readClients = async (req, res) => {
           { is_deleted: false },
           {
             $or: [
-              { company_name: { $regex: search, $options: "i" } },
+              { company_name: { $regex: search, $options: 'i' } },
               { number_str: { $regex: search } },
+              { company_email: { $regex: search, $options: 'i' } },
             ],
           },
         ],
@@ -65,8 +84,9 @@ exports.readClients = async (req, res) => {
               { is_deleted: false },
               {
                 $or: [
-                  { company_name: { $regex: search, $options: "i" } },
+                  { company_name: { $regex: search, $options: 'i' } },
                   { number_str: { $regex: search } },
+                  { company_email: { $regex: search, $options: 'i' } },
                 ],
               },
             ],
@@ -78,18 +98,18 @@ exports.readClients = async (req, res) => {
         ...CLIENT_PIPELINE,
       ]);
     }
-    logger.accessLog.info("client fetch successfully");
+    logger.accessLog.info('client fetch successfully');
     res.send({
       statusCode: 200,
-      message: "The client has been fetched successfully",
+      message: 'The client has been fetched successfully',
       total: totalDataCount,
       data: allClients,
     });
   } catch (err) {
-    logger.errorLog.error("client fetch fail");
+    logger.errorLog.error('client fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the client",
+      message: 'Failed to fetch the client',
       error: err,
     });
   }
@@ -98,27 +118,38 @@ exports.readClients = async (req, res) => {
 exports.readClientById = async (req, res) => {
   try {
     const { id } = req.params;
+    const clientObjectId = mongoose.Types.ObjectId(id);
+
     const clientData = await client.aggregate([
       {
         $match: {
-          _id: mongoose.Types.ObjectId(id),
+          _id: clientObjectId,
           is_deleted: false,
         },
       },
       { $sort: { createdAt: -1 } },
       ...CLIENT_PIPELINE,
     ]);
-    logger.accessLog.info("client fetch success");
+
+    if (clientData && clientData.length > 0) {
+      const taskData = await task.aggregate(
+        CLIENT_TASK_PIPELINE(clientObjectId),
+      );
+
+      clientData[0].tasks = taskData;
+    }
+
+    logger.accessLog.info('client fetch success');
     res.send({
       statusCode: 200,
-      message: "The client has been fetched successfully",
+      message: 'The client has been fetched successfully',
       data: clientData,
     });
   } catch (err) {
-    logger.errorLog.error("client fetch fail");
+    logger.errorLog.error('client fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the client",
+      message: 'Failed to fetch the client',
       error: err,
     });
   }
@@ -133,17 +164,17 @@ exports.readAllClient = async (req, res) => {
       { $sort: { company_name: 1 } },
       ...CLIENT_PIPELINE,
     ]);
-    logger.accessLog.info("client fetch success");
+    logger.accessLog.info('client fetch success');
     res.send({
       statusCode: 200,
-      message: "The client has been fetched successfully",
+      message: 'The client has been fetched successfully',
       data: userData,
     });
   } catch (err) {
-    logger.errorLog.error("client fetch fail");
+    logger.errorLog.error('client fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the client",
+      message: 'Failed to fetch the client',
       error: err,
     });
   }
@@ -163,36 +194,36 @@ exports.createClient = async (req, res) => {
     } = req.body;
     let companyName = req.body.companyName.trim();
     const GET_STATE_CODE = getSubdivisionCodeWithoutCountry(
-      locations[0].stateprovince
+      locations[0].stateprovince,
     );
     const body = {
       PrimaryEmailAddr: {
-        Address: companyEmail,
+        Address: companyEmail.trim(),
       },
       DisplayName: companyName,
       BillAddr: {
         CountrySubDivisionCode: GET_STATE_CODE
-          ? GET_STATE_CODE.isoCode + ", "
-          : "BC",
+          ? GET_STATE_CODE.isoCode + ', '
+          : 'BC',
         City: locations?.[0]?.city,
-        PostalCode: locations?.[0]?.postalCode ?? "94042",
-        Line1: locations?.[0]?.muncipleAddress ?? "123 Main Street",
-        Country: GET_STATE_CODE ? GET_STATE_CODE.countryCode : "CA",
+        PostalCode: locations?.[0]?.postalCode ?? '94042',
+        Line1: locations?.[0]?.muncipleAddress ?? '123 Main Street',
+        Country: GET_STATE_CODE ? GET_STATE_CODE.countryCode : 'CA',
       },
     };
 
     const api = `${QB_CONFIG.baseUrl}/query?minorversion=69`;
 
     // QuickBooks Query
-    let bodyData = "";
+    let bodyData = '';
     let body_text = `SELECT * FROM Customer WHERE DisplayName = '${companyName}'`;
     let response;
     // Make API Call
     response = await QuickBooksHelper.makeQuickBooksApiPostCall(
       api,
       bodyData,
-      "text",
-      body_text
+      'text',
+      body_text,
     );
     if (
       response.Fault &&
@@ -203,27 +234,28 @@ exports.createClient = async (req, res) => {
         statusCode: 500,
         message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
-          "Oops Something went wrong. Please contact the administrator---",
+          'Oops Something went wrong. Please contact the administrator---',
       });
     }
 
-    response = response?.QueryResponse?.Customer ? { Customer: response?.QueryResponse?.Customer?.[0] } : ''
+    response = response?.QueryResponse?.Customer
+      ? { Customer: response?.QueryResponse?.Customer?.[0] }
+      : '';
     if (response) {
-      const existingClient = await client.findOne({ qb_customer_id: response.Customer.Id });
+      const existingClient = await client.findOne({
+        qb_customer_id: response.Customer.Id,
+      });
       if (existingClient) {
         return res.send({
           statusCode: 500,
-          message: "Client Duplicate Name Exists Error",
+          message: 'Client Duplicate Name Exists Error',
         });
       }
     }
 
     if (!response) {
       const apiUrl = `${QB_CONFIG.baseUrl}/customer`;
-      response = await QuickBooksHelper.makeQuickBooksApiPostCall(
-        apiUrl,
-        body
-      );
+      response = await QuickBooksHelper.makeQuickBooksApiPostCall(apiUrl, body);
 
       if (
         response.Fault &&
@@ -234,7 +266,7 @@ exports.createClient = async (req, res) => {
           statusCode: 500,
           message:
             `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
-            "Oops Something went wrong. Please contact the administrator",
+            'Oops Something went wrong. Please contact the administrator',
         });
       }
     }
@@ -303,18 +335,18 @@ exports.createClient = async (req, res) => {
       attachments.map(async (attachmentItem, index) => {
         const { description, image } = attachmentItem;
         const data = image?.slice(22);
-        const buffer = Buffer.from(data, "base64");
+        const buffer = Buffer.from(data, 'base64');
         Jimp.read(buffer, (error, res) => {
           if (error) {
             logger.errorLog.error(
-              `error at catch from image generation : ${error}`
+              `error at catch from image generation : ${error}`,
             );
           } else {
             res
               .quality(5)
               .write(
                 __dirname +
-                `/../public/client/attachments/${newClient._id}_${index}.png`
+                  `/../public/client/attachments/${newClient._id}_${index}.png`,
               );
           }
         });
@@ -330,7 +362,7 @@ exports.createClient = async (req, res) => {
       await newClient.save();
       await client.findByIdAndUpdate(newClient._id, {
         $set: {
-          number_str: newClient.number.toString().padStart(6, "0"),
+          number_str: newClient.number.toString().padStart(6, '0'),
         },
       });
 
@@ -341,18 +373,18 @@ exports.createClient = async (req, res) => {
         },
       });
 
-      logger.accessLog.info("client create successfully");
+      logger.accessLog.info('client create successfully');
       res.send({
         statusCode: 200,
-        message: "The client has been created successfully",
+        message: 'The client has been created successfully',
         client: newClient,
       });
     }
   } catch (err) {
-    logger.errorLog.error("client create fail");
+    logger.errorLog.error('client create fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -372,7 +404,7 @@ exports.updateClient = async (req, res) => {
       companyEmail,
     } = req.body;
     const GET_STATE_CODE = getSubdivisionCodeWithoutCountry(
-      locations[0].stateprovince
+      locations[0].stateprovince,
     );
     let companyName = req.body.companyName.trim();
     const userData = await client.findOne({ _id: id, is_deleted: false });
@@ -381,7 +413,7 @@ exports.updateClient = async (req, res) => {
       const incomingIds = incomingData.map((item) => item._id);
       const existingRecords = await model.find({ client_id: clientId });
       const existingIds = existingRecords.map((record) =>
-        record._id.toString()
+        record._id.toString(),
       );
       const idsToDelete = existingIds.filter((id) => !incomingIds.includes(id));
 
@@ -399,23 +431,23 @@ exports.updateClient = async (req, res) => {
       Id: userData?.qb_customer_id,
       SyncToken: userData?.SyncToken,
       PrimaryEmailAddr: {
-        Address: companyEmail,
+        Address: companyEmail.trim(),
       },
       DisplayName: companyName,
       BillAddr: {
         CountrySubDivisionCode: GET_STATE_CODE
-          ? GET_STATE_CODE.isoCode + ", "
-          : "BC ",
+          ? GET_STATE_CODE.isoCode + ', '
+          : 'BC ',
         City: locations?.[0]?.city,
-        PostalCode: locations?.[0]?.postalCode ?? "94042",
-        Line1: locations?.[0]?.muncipleAddress ?? "123 Main Street",
-        Country: GET_STATE_CODE ? GET_STATE_CODE.countryCode : "CA",
+        PostalCode: locations?.[0]?.postalCode ?? '94042',
+        Line1: locations?.[0]?.muncipleAddress ?? '123 Main Street',
+        Country: GET_STATE_CODE ? GET_STATE_CODE.countryCode : 'CA',
       },
     };
     const apiUrl = `${QB_CONFIG.baseUrl}/customer`;
     const response = await QuickBooksHelper.makeQuickBooksApiPostCall(
       apiUrl,
-      body
+      body,
     );
     if (
       response.Fault &&
@@ -426,7 +458,7 @@ exports.updateClient = async (req, res) => {
         statusCode: 500,
         message:
           `${response.Fault.Error[0].Message} ${response.Fault.Error[0].Detail}` ||
-          "Oops Something went wrong. Please contact the administrator",
+          'Oops Something went wrong. Please contact the administrator',
       });
     }
     const updateClientData = await client.findByIdAndUpdate(id, {
@@ -472,7 +504,7 @@ exports.updateClient = async (req, res) => {
             await clientlocation.findByIdAndUpdate(
               _id,
               { $set: locationData },
-              { new: true, upsert: true } // `upsert` ensures a record is created if it doesn't exist
+              { new: true, upsert: true }, // `upsert` ensures a record is created if it doesn't exist
             );
           } else {
             // Create a new location if ID is not present
@@ -517,14 +549,14 @@ exports.updateClient = async (req, res) => {
               await clientcontact.findByIdAndUpdate(
                 _id,
                 { $set: contactData },
-                { new: true, upsert: true }
+                { new: true, upsert: true },
               );
             } else {
               // Create new contact
               const newContact = new clientcontact(contactData);
               await newContact.save();
             }
-          })
+          }),
         );
 
         // Handle Attachments
@@ -532,7 +564,7 @@ exports.updateClient = async (req, res) => {
           attachments.map(async (attachmentItem, index) => {
             const { _id, description, image } = attachmentItem; // Assuming `id` is included for updates
             const data = image.slice(22);
-            const buffer = Buffer.from(data, "base64");
+            const buffer = Buffer.from(data, 'base64');
 
             const fileName = `${updateClientData._id}_${index}.png`;
             const attachmentPath = `${__dirname}/../public/client/attachments/${fileName}`;
@@ -542,7 +574,7 @@ exports.updateClient = async (req, res) => {
               Jimp.read(buffer, (error, res) => {
                 if (error) {
                   logger.errorLog.error(
-                    `Error at image generation: ${error.message}`
+                    `Error at image generation: ${error.message}`,
                   );
                   return reject(error);
                 }
@@ -561,32 +593,32 @@ exports.updateClient = async (req, res) => {
               await clientattchment.findByIdAndUpdate(
                 _id,
                 { $set: attachmentData },
-                { new: true, upsert: true }
+                { new: true, upsert: true },
               );
             } else {
               // Create new attachment
               const newAttachment = new clientattchment(attachmentData);
               await newAttachment.save();
             }
-          })
+          }),
         );
 
         // Save the updated client data
         await updateClientData.save();
       }
 
-      logger.accessLog.info("client update successfully");
+      logger.accessLog.info('client update successfully');
       res.send({
         statusCode: 200,
-        message: "The client has been updated successfully",
+        message: 'The client has been updated successfully',
         client: updateClientData,
       });
     }
   } catch (err) {
-    logger.errorLog.error("client update fail");
+    logger.errorLog.error('client update fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -597,30 +629,30 @@ exports.deleteClient = async (req, res) => {
     const { id } = req.params;
     await clientlocation.updateMany(
       { client_id: id },
-      { $set: { is_deleted: true } }
+      { $set: { is_deleted: true } },
     );
     await clientcontact.updateMany(
       { client_id: id },
-      { $set: { is_deleted: true } }
+      { $set: { is_deleted: true } },
     );
     await clientattchment.updateMany(
       { client_id: id },
-      { $set: { is_deleted: true } }
+      { $set: { is_deleted: true } },
     );
     const deleteClientData = await client.findByIdAndUpdate(id, {
       $set: { is_deleted: true },
     });
-    logger.accessLog.info("client delete successfully");
+    logger.accessLog.info('client delete successfully');
     res.send({
       statusCode: 200,
-      message: "The client has been deleted successfully",
+      message: 'The client has been deleted successfully',
       client: deleteClientData,
     });
   } catch (err) {
-    logger.errorLog.error("client delete fail");
+    logger.errorLog.error('client delete fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }

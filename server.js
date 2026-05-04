@@ -3,9 +3,8 @@ const app = express();
 const cors = require('cors');
 const crypto = require('crypto');
 require('dotenv').config();
-const port = process.env.PORT;
+const port = Number(process.env.PORT) || 3007;
 var bodyParser = require('body-parser');
-const basicAuth = require('express-basic-auth');
 const dbconnection = require('./config/db');
 const {
   ExpressAdapter,
@@ -37,7 +36,7 @@ exports.stamp = new temporaryStamp(key, cipher, hash, iv);
       repeat: { cron: '1 12 * * *' },
       removeOnComplete: { count: 100 },
       removeOnFail: false,
-    }
+    },
   );
 })();
 
@@ -47,23 +46,13 @@ serverAdapter.setBasePath('/dashboard');
 createBullBoard({
   queues: [
     new BullMQAdapter(forgotPasswordQueue),
-    new BullMQAdapter(createAccountQueue),
     new BullMQAdapter(schedulingStatusQueue),
+    new BullMQAdapter(createAccountQueue),
   ],
   serverAdapter: serverAdapter,
 });
 
-app.use(
-  '/dashboard',
-  basicAuth({
-    users: {
-      [process.env.BULL_DASHBOARD_USER]: process.env.BULL_DASHBOARD_PASSWORD,
-    },
-    challenge: true, // prompts browser login dialog
-  }),
-  serverAdapter.getRouter(),
-);
-
+app.use('/dashboard', serverAdapter.getRouter());
 app.use(cors());
 app.set('view engine', 'ejs');
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -83,5 +72,5 @@ app.set('view engine', 'ejs');
 app.use('/api', indexRouter);
 
 app.listen(port, () => {
-  console.log('Server Rinnung on http://localhost:3005');
+  console.log(`Server Rinnung on http://localhost:${port}`);
 });

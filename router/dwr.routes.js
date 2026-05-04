@@ -1,5 +1,5 @@
-const express = require("express");
-const Joi = require("joi");
+const express = require('express');
+const Joi = require('joi');
 const {
   readDwr,
   readDwrById,
@@ -10,17 +10,18 @@ const {
   deleteDwr,
   updateDwrStatus,
   getDwrHoursByTaskId,
-} = require("../controller/dwr.controller");
+  updateDwrStatusBulk,
+} = require('../controller/dwr.controller');
 
 const route = express.Router();
 
 const validation = Joi.object({
   DwrDetail: {
-    remark: Joi.string().optional().allow(""),
+    remark: Joi.string().optional().allow(''),
     task_id: Joi.string().required(),
     task_date: Joi.string().required(),
     task_hour: Joi.number().required(),
-    estimated_hour: Joi.number().optional().allow(""),
+    estimated_hour: Joi.number().optional().allow(''),
     submit_status: Joi.boolean().default(false),
   },
 });
@@ -37,7 +38,7 @@ const dwrValidation = async (req, res, next) => {
   };
 
   const { error } = validation.validate(payload, {
-    errors: { label: "key", wrap: { label: false } },
+    errors: { label: 'key', wrap: { label: false } },
   });
   if (error) {
     console.log(error);
@@ -51,12 +52,14 @@ const dwrValidation = async (req, res, next) => {
   }
 };
 
-route.get("/", readDwr);
-route.get("/one/:id", readDwrById);
-route.get("/all", readAllDwr);
-route.post("/create", dwrValidation, createDwr);
-route.post("/update/:id", dwrValidation, updateDwrAdmin);
-route.post("/delete/:id", deleteDwr);
-route.get("/task/:task_id", getDwrHoursByTaskId);
-route.post("/update_status/:id", updateDwrStatus);
+route.get('/', readDwr);
+route.get('/one/:id', readDwrById);
+route.get('/all', readAllDwr);
+route.post('/create', dwrValidation, createDwr);
+route.post('/update/:id', dwrValidation, updateDwrAdmin);
+route.post('/delete/:id', deleteDwr);
+route.get('/task/:task_id', getDwrHoursByTaskId);
+route.post('/update_status/:id', updateDwrStatus);
+route.post('/update_status_bulk', updateDwrStatusBulk);
+
 module.exports = route;

@@ -112,7 +112,6 @@ exports.manager_permission = [
   'jobscope_delete',
   'jobscope_read',
   'jobscope_one',
-  'jobscope_all',
   'costiteam_create',
   'costiteam_update',
   'costiteam_delete',
@@ -186,6 +185,10 @@ exports.manager_permission = [
   'employee-leave_create',
   'employee-leave_update',
   'employee-leave_delete',
+  'dwr_update_status_bulk',
+  'task_duplicate',
+  'task_get-invoices-by-tasks',
+  'task_get-invoices-by-client',
 ];
 
 exports.admin_permission = [
@@ -365,4 +368,8 @@ exports.admin_permission = [
   'employee-leave_create',
   'employee-leave_update',
   'employee-leave_delete',
+  'dwr_update_status_bulk',
+  'task_duplicate',
+  'task_get-invoices-by-tasks',
+  'task_get-invoices-by-client',
 ];

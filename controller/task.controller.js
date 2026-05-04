@@ -1,7 +1,6 @@
-const { mongoose } = require("mongoose");
-const mongooseLib = require("mongoose");
-const logger = require("../middleware/logger");
-const Jimp = require("jimp");
+const { mongoose } = require('mongoose');
+const logger = require('../middleware/logger');
+const Jimp = require('jimp');
 const {
   TASK_PIPELINE,
   CLIENT_PIPELINE,
@@ -9,24 +8,26 @@ const {
   QUOTE_PIPELINE,
   QUOTE_TASK_PIPELINE,
   DWR_PIPELINE,
-} = require("../middleware/pipelines");
-const task = require("../models/task");
-const client = require("../models/client");
-const job = require("../models/job");
-const quote = require("../models/quote");
-const ratesheet = require("../models/ratesheet");
-const user = require("../models/user");
-const jobscope = require("../models/jobscope");
-const jobcategory = require("../models/jobcategory");
-const jobstatus = require("../models/jobstatus");
-const costItem = require("../models/costiteam");
-const office = require("../models/office");
-const dwr = require("../models/dwr");
-const scheduling = require("../models/scheduling");
+  INVOICE_PIPELINE,
+} = require('../middleware/pipelines');
+const task = require('../models/task');
+const client = require('../models/client');
+const job = require('../models/job');
+const quote = require('../models/quote');
+const ratesheet = require('../models/ratesheet');
+const user = require('../models/user');
+const jobscope = require('../models/jobscope');
+const jobcategory = require('../models/jobcategory');
+const jobstatus = require('../models/jobstatus');
+const costItem = require('../models/costiteam');
+const office = require('../models/office');
+const dwr = require('../models/dwr');
+const scheduling = require('../models/scheduling');
+const invoice = require('../models/invoice');
 
-const { default: axios } = require("axios");
-const { startOfDay, endOfDay } = require("date-fns");
-const getLabourCostItems = require("../utils/getLabourCostItems");
+const { default: axios } = require('axios');
+const { startOfDay, endOfDay } = require('date-fns');
+const getLabourCostItems = require('../utils/getLabourCostItems');
 
 exports.TaskInitalData = async (req, res) => {
   try {
@@ -51,7 +52,7 @@ exports.TaskInitalData = async (req, res) => {
     const ratesheetData = await ratesheet.find({ is_deleted: false });
     const managerData = await user.find({
       is_deleted: false,
-      role: "manager",
+      role: 'manager',
     });
     const scopeData = await jobscope
       .find({ is_deleted: false })
@@ -62,20 +63,20 @@ exports.TaskInitalData = async (req, res) => {
     const statusData = await jobstatus.find({ is_deleted: false });
     const labourCostItemData = await costItem.find({
       is_deleted: false,
-      category: "Labour Cost Items",
+      category: 'Labour Cost Items',
     });
     const materialCostItemData = await costItem.find({
       is_deleted: false,
-      category: "Equipment and Materials Item",
+      category: 'Equipment and Materials Item',
     });
     const fixedCostItemData = await costItem.find({
       is_deleted: false,
-      category: "Fixed Price Item",
+      category: 'Fixed Price Item',
     });
-    logger.accessLog.info("task inital data fetch success");
+    logger.accessLog.info('task inital data fetch success');
     res.send({
       statusCode: 200,
-      message: "The task initial data has been fetched successfully",
+      message: 'The task initial data has been fetched successfully',
       data: {
         client: clientData,
         job: [],
@@ -93,10 +94,10 @@ exports.TaskInitalData = async (req, res) => {
       },
     });
   } catch (err) {
-    logger.errorLog.error("task inital data fetch fail");
+    logger.errorLog.error('task inital data fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the task initial data",
+      message: 'Failed to fetch the task initial data',
       error: err,
     });
   }
@@ -127,17 +128,17 @@ exports.readTaskById = async (req, res) => {
       ...TASK_PIPELINE,
     ]);
     const taskData = [...taskDatawithQuote, ...taskDatawithoutQuote];
-    logger.accessLog.info("task fetch success");
+    logger.accessLog.info('task fetch success');
     res.send({
       statusCode: 200,
-      message: "The task has been fetched successfully",
+      mssage: 'The task has been fetched successfully',
       data: taskData,
     });
   } catch (err) {
-    logger.errorLog.error("task fetch fail");
+    logger.errorLog.error('task fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the task",
+      message: 'Failed to fetch the task',
       error: err,
     });
   }
@@ -149,14 +150,14 @@ exports.readTask = async (req, res) => {
     var per_page = req.query.per_page;
     var search = decodeURIComponent(req.query.search);
     var sortField = req.query.sortField;
-    var sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    var sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     var user_id = req.query.user_id;
     var start_date = req.query.startDate ?? null;
     var end_date = req.query.endDate ?? null;
-    let sortType = req.query.is_complete === "1" ? "updatedAt" : "createdAt";
+    let sortType = req.query.is_complete === '1' ? 'updatedAt' : 'createdAt';
 
     if (page === undefined) {
-      page = "1";
+      page = '1';
     }
     if (per_page === undefined) {
       per_page = process.env.PAGINATION;
@@ -169,7 +170,7 @@ exports.readTask = async (req, res) => {
     var myMatchCount = {
       is_deleted: false,
     };
-    if (user_id && user_id !== "All_Manager") {
+    if (user_id && user_id !== 'All_Manager') {
       myMatch.project_manager = mongoose.Types.ObjectId(user_id);
       myMatchCount.project_manager = mongoose.Types.ObjectId(user_id);
     }
@@ -182,7 +183,7 @@ exports.readTask = async (req, res) => {
     if (req.query.endDate && req.query.startDate) {
       const start = startOfDay(new Date(start_date));
       const end = endOfDay(new Date(end_date));
-      if (req.query.is_complete === "1") {
+      if (req.query.is_complete === '1') {
         myMatch.completed_task_date = {
           $gte: start,
           $lt: end,
@@ -195,17 +196,17 @@ exports.readTask = async (req, res) => {
       }
     }
 
-    if (search === "") {
+    if (search === '') {
       var totalDataCount = await task.countDocuments(myMatch);
-      if (sortField === "job_number") {
+      if (sortField === 'job_number') {
         var allTasks = await task.aggregate([
           { $match: myMatch },
           ...TASK_PIPELINE,
-          { $sort: { "job_id.number": sortOrder, [sortType]: -1 } },
+          { $sort: { 'job_id.number': sortOrder, [sortType]: -1 } },
           { $skip: parseInt(data) },
           { $limit: parseInt(per_page) },
         ]);
-      } else if (sortField === "manager") {
+      } else if (sortField === 'manager') {
         var allTasks = await task.aggregate([
           ...TASK_PIPELINE,
           { $match: myMatch },
@@ -213,9 +214,9 @@ exports.readTask = async (req, res) => {
             $addFields: {
               full_name: {
                 $concat: [
-                  "$project_manager_detail.first_name",
-                  " ",
-                  "$project_manager_detail.last_name",
+                  '$project_manager_detail.first_name',
+                  ' ',
+                  '$project_manager_detail.last_name',
                 ],
               },
             },
@@ -241,17 +242,17 @@ exports.readTask = async (req, res) => {
             myMatch,
             {
               $or: [
-                { number_str: { $regex: search, $options: "i" } },
-                { "job_id.number_str": { $regex: search, $options: "i" } },
+                { number_str: { $regex: search, $options: 'i' } },
+                { 'job_id.number_str': { $regex: search, $options: 'i' } },
                 {
-                  "client_id.company_name": {
+                  'client_id.company_name': {
                     $regex: search,
-                    $options: "i",
+                    $options: 'i',
                   },
                 },
-                { "invoice_id.number_str": { $regex: search, $options: "i" } },
-                { "invoice_id.doc_number": { $regex: search, $options: "i" } },
-                { "task_scope_id.name": { $regex: search, $options: "i" } },
+                { 'invoice_id.number_str': { $regex: search, $options: 'i' } },
+                { 'invoice_id.doc_number': { $regex: search, $options: 'i' } },
+                { 'task_scope_id.name': { $regex: search, $options: 'i' } },
               ],
             },
           ],
@@ -261,7 +262,7 @@ exports.readTask = async (req, res) => {
         ...TASK_PIPELINE,
         matchWhere,
         {
-          $count: "totalDataCount",
+          $count: 'totalDataCount',
         },
       ];
 
@@ -270,15 +271,15 @@ exports.readTask = async (req, res) => {
         totalDataCountResult.length > 0
           ? totalDataCountResult[0].totalDataCount
           : 0;
-      if (sortField === "job_number") {
+      if (sortField === 'job_number') {
         var allTasks = await task.aggregate([
           ...TASK_PIPELINE,
           matchWhere,
-          { $sort: { "job_id.number": sortOrder, [sortType]: -1 } },
+          { $sort: { 'job_id.number': sortOrder, [sortType]: -1 } },
           { $skip: parseInt(data) },
           { $limit: parseInt(per_page) },
         ]);
-      } else if (sortField === "manager") {
+      } else if (sortField === 'manager') {
         var allTasks = await task.aggregate([
           ...TASK_PIPELINE,
           matchWhere,
@@ -286,9 +287,9 @@ exports.readTask = async (req, res) => {
             $addFields: {
               full_name: {
                 $concat: [
-                  "$project_manager_detail.first_name",
-                  " ",
-                  "$project_manager_detail.last_name",
+                  '$project_manager_detail.first_name',
+                  ' ',
+                  '$project_manager_detail.last_name',
                 ],
               },
             },
@@ -308,18 +309,18 @@ exports.readTask = async (req, res) => {
       }
     }
 
-    logger.accessLog.info("task fetch success");
+    logger.accessLog.info('task fetch success');
     res.send({
       statusCode: 200,
-      message: "The task has been fetched successfully",
+      message: 'The task has been fetched successfully',
       total: totalDataCount,
       data: allTasks,
     });
   } catch (err) {
-    logger.errorLog.error("task fetch fail");
+    logger.errorLog.error('task fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the task",
+      message: 'Failed to fetch the task',
       error: err,
     });
   }
@@ -342,7 +343,7 @@ exports.totalEstimatedBillableCost = async (req, res) => {
       };
     }
   }
-  if (user_id && user_id !== "All_Manager") {
+  if (user_id && user_id !== 'All_Manager') {
     myMatch.project_manager = mongoose.Types.ObjectId(user_id);
   }
 
@@ -366,7 +367,7 @@ exports.totalEstimatedBillableCost = async (req, res) => {
           return dwrsEntry.billing_line_items.labourCosts
             .map((dwrsItem) => {
               const estimateMatch = ESTIMATE.labourItem.find(
-                (estimateItem) => estimateItem.costItem === dwrsItem.costitem
+                (estimateItem) => estimateItem.costItem === dwrsItem.costitem,
               );
 
               if (estimateMatch) {
@@ -383,7 +384,7 @@ exports.totalEstimatedBillableCost = async (req, res) => {
               return null;
             })
             .filter(Boolean);
-        }
+        },
       );
     };
 
@@ -393,7 +394,7 @@ exports.totalEstimatedBillableCost = async (req, res) => {
       const totalOfDwrCost = calculateBillableCosts(item);
       const totalBilebleSum = totalOfDwrCost.reduce(
         (acc, curr) => acc + curr.totalCost,
-        0
+        0,
       );
 
       totalBillableCost = totalBillableCost + parseFloat(totalBilebleSum);
@@ -402,7 +403,7 @@ exports.totalEstimatedBillableCost = async (req, res) => {
           totalEstimatedCost =
             totalEstimatedCost +
             parseFloat(
-              item?.invoice_id?.sub_total ? item?.invoice_id?.sub_total : 0
+              item?.invoice_id?.sub_total ? item?.invoice_id?.sub_total : 0,
             );
         }
       } else {
@@ -413,16 +414,16 @@ exports.totalEstimatedBillableCost = async (req, res) => {
     });
     res.send({
       statusCode: 200,
-      message: "Total Cost has been fetched successfully",
+      message: 'Total Cost has been fetched successfully',
       totalBillableCost: totalBillableCost,
       totalEstimatedCost: totalEstimatedCost,
       totalDataCount: totalDataCount,
     });
   } catch (error) {
-    logger.errorLog.error("task fetch fail");
+    logger.errorLog.error('task fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the total cost",
+      message: 'Failed to fetch the total cost',
       error: error,
     });
   }
@@ -437,18 +438,18 @@ exports.readAllTask = async (req, res) => {
         },
       },
     ]);
-    logger.accessLog.info("task fetch success");
+    logger.accessLog.info('task fetch success');
     res.send({
       statusCode: 200,
-      message: "The task has been fetched successfully",
+      message: 'The task has been fetched successfully',
       data: userData,
       updatedwrData: updatedwrData,
     });
   } catch (err) {
-    logger.errorLog.error("task fetch fail");
+    logger.errorLog.error('task fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the task",
+      message: 'Failed to fetch the task',
       error: err,
     });
   }
@@ -492,25 +493,25 @@ exports.createTask = async (req, res) => {
       attachments,
       total_cost_hour,
     } = req.body;
-    if (req.body.attachments && req.body.attachments !== "") {
+    if (req.body.attachments && req.body.attachments !== '') {
       const data = attachments?.slice(22);
-      const buffer = Buffer.from(data, "base64");
+      const buffer = Buffer.from(data, 'base64');
       req.body.attachments = `${Date.now()}_task.png`;
       Jimp.read(buffer, (error, res) => {
         if (error) {
           logger.errorLog.error(
-            `error at catch from image generation : ${error}`
+            `error at catch from image generation : ${error}`,
           );
         } else {
           res
             .quality(5)
             .write(
-              __dirname + `/../public/task/attachments/${req.body.attachments}`
+              __dirname + `/../public/task/attachments/${req.body.attachments}`,
             );
         }
       });
     } else {
-      req.body.attachments = "";
+      req.body.attachments = '';
     }
 
     const [newTask] = await task.create(
@@ -555,25 +556,25 @@ exports.createTask = async (req, res) => {
           active: active,
         },
       ],
-      { session }
+      { session },
     );
     if (newTask) {
-      if (req.body.selectQuote_id || req.body.selectQuote_id !== "") {
+      if (req.body.selectQuote_id || req.body.selectQuote_id !== '') {
         await quote.findByIdAndUpdate(
           req.body.selectQuote_id,
           { $set: { is_converted: 1 } },
-          { session }
+          { session },
         );
       }
       await task.findByIdAndUpdate(
         newTask._id,
-        { $set: { number_str: newTask.number.toString().padStart(6, "0") } },
-        { session }
+        { $set: { number_str: newTask.number.toString().padStart(6, '0') } },
+        { session },
       );
 
       const validCostItems = await getLabourCostItems();
       const filteredLabourItems = (labourItem || []).filter(
-        (item) => item.costItem && validCostItems.includes(item.costItem)
+        (item) => item.costItem && validCostItems.includes(item.costItem),
       );
 
       if (filteredLabourItems.length > 0) {
@@ -581,9 +582,7 @@ exports.createTask = async (req, res) => {
           task_id: newTask._id,
           job_id: selectJob,
           select_client_id: selectClient_id,
-          project_managers: ProjectManager
-            ? [{ manager: ProjectManager }]
-            : [],
+          project_managers: ProjectManager ? [{ manager: ProjectManager }] : [],
           cost_item: [item.costItem],
           cost_uuid: item.uuid || null,
           task_scope_id: TaskScope || null,
@@ -597,20 +596,20 @@ exports.createTask = async (req, res) => {
       await session.commitTransaction();
       session.endSession();
 
-      logger.accessLog.info("task create success");
+      logger.accessLog.info('task create success');
       res.send({
         statusCode: 200,
-        message: "The task has been created successfully",
+        message: 'The task has been created successfully',
         task: newTask,
       });
     }
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
-    logger.errorLog.error("task create fail");
+    logger.errorLog.error('task create fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -653,30 +652,30 @@ exports.updateTask = async (req, res) => {
       active,
       attachments,
     } = req.body;
-    if (attachments !== "") {
-      if (attachments.includes("task")) {
+    if (attachments !== '') {
+      if (attachments.includes('task')) {
         req.body.attachments = req.body.attachments;
       } else {
         const data = attachments?.slice(22);
-        const buffer = Buffer.from(data, "base64");
+        const buffer = Buffer.from(data, 'base64');
         req.body.attachments = `${Date.now()}_task.png`;
         Jimp.read(buffer, (error, res) => {
           if (error) {
             logger.errorLog.error(
-              `error at catch from image generation : ${error}`
+              `error at catch from image generation : ${error}`,
             );
           } else {
             res
               .quality(5)
               .write(
                 __dirname +
-                `/../public/task/attachments/${req.body.attachments}`
+                  `/../public/task/attachments/${req.body.attachments}`,
               );
           }
         });
       }
     } else {
-      req.body.attachments = "";
+      req.body.attachments = '';
     }
 
     const updateTaskData = await task.findByIdAndUpdate(id, {
@@ -732,33 +731,32 @@ exports.updateTask = async (req, res) => {
       });
 
       const existingCostItems = existingSchedulings.map(
-        (doc) => (doc.cost_item && doc.cost_item[0]) || null
+        (doc) => (doc.cost_item && doc.cost_item[0]) || null,
       );
 
       const toDelete = existingSchedulings.filter(
         (doc) =>
-          !newCostItems.includes((doc.cost_item && doc.cost_item[0]) || null)
+          !newCostItems.includes((doc.cost_item && doc.cost_item[0]) || null),
       );
 
       const toAdd = newCostItems.filter(
-        (costItem) => !existingCostItems.includes(costItem)
+        (costItem) => !existingCostItems.includes(costItem),
       );
 
       if (toDelete.length > 0) {
         const deleteIds = toDelete.map((doc) => doc._id);
         await scheduling.updateMany(
           { _id: { $in: deleteIds } },
-          { $set: { is_deleted: true } }
+          { $set: { is_deleted: true } },
         );
       }
 
-      const existingToKeep = existingSchedulings.filter(
-        (doc) =>
-          newCostItems.includes((doc.cost_item && doc.cost_item[0]) || null)
+      const existingToKeep = existingSchedulings.filter((doc) =>
+        newCostItems.includes((doc.cost_item && doc.cost_item[0]) || null),
       );
       for (const doc of existingToKeep) {
         const matchedItem = (labourItem || []).find(
-          (item) => item.costItem === (doc.cost_item && doc.cost_item[0])
+          (item) => item.costItem === (doc.cost_item && doc.cost_item[0]),
         );
         await scheduling.findByIdAndUpdate(doc._id, {
           $set: {
@@ -774,7 +772,7 @@ exports.updateTask = async (req, res) => {
       if (toAdd.length > 0) {
         const newSchedulingDocs = toAdd.map((costItemId) => {
           const matchedItem = (labourItem || []).find(
-            (item) => item.costItem === costItemId
+            (item) => item.costItem === costItemId,
           );
           return {
             task_id: updateTaskData._id,
@@ -794,18 +792,18 @@ exports.updateTask = async (req, res) => {
         await scheduling.create(newSchedulingDocs);
       }
 
-      logger.accessLog.info("task update success");
+      logger.accessLog.info('task update success');
       res.send({
         statusCode: 200,
-        message: "The task has been updated successfully",
+        message: 'The task has been updated successfully',
         task: updateTaskData,
       });
     }
   } catch (err) {
-    logger.errorLog.error("task update fail");
+    logger.errorLog.error('task update fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -817,7 +815,7 @@ exports.updateTaskStatus = async (req, res) => {
     const { status, task_complete_date } = req.body;
 
     let updateStatus = 0;
-    if (status === "complete") {
+    if (status === 'complete') {
       updateStatus = 1;
     } else {
       updateStatus = 2;
@@ -829,17 +827,17 @@ exports.updateTaskStatus = async (req, res) => {
     });
     if (updatejobData) {
       await updatejobData.save();
-      logger.accessLog.info("Task status updated Successfully");
+      logger.accessLog.info('Task status updated Successfully');
       res.send({
         statusCode: 200,
-        message: "The task has been updated successfully",
+        message: 'The task has been updated successfully',
       });
     }
   } catch (err) {
-    logger.errorLog.error("Task status update fail");
+    logger.errorLog.error('Task status update fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -857,7 +855,7 @@ exports.deleteTask = async (req, res) => {
     if (DWRRelatedDataExists) {
       return res.send({
         statusCode: 400,
-        message: "Cannot delete. Task is referenced in Dwr collection.",
+        message: 'Cannot delete. Task is referenced in Dwr collection.',
       });
     }
     const taskDetails = await task.findById(id);
@@ -870,7 +868,7 @@ exports.deleteTask = async (req, res) => {
         quoteDataExists._id,
         {
           $set: { is_converted: 0 },
-        }
+        },
       );
     }
     const deleteTaskData = await task.findByIdAndUpdate(id, {
@@ -879,20 +877,20 @@ exports.deleteTask = async (req, res) => {
 
     await scheduling.updateMany(
       { task_id: mongooseLib.Types.ObjectId(id), is_deleted: false },
-      { $set: { is_deleted: true } }
+      { $set: { is_deleted: true } },
     );
 
-    logger.accessLog.info("task delete success");
+    logger.accessLog.info('task delete success');
     res.send({
       statusCode: 200,
-      message: "The task has been deleted successfully",
+      message: 'The task has been deleted successfully',
       task: deleteTaskData,
     });
   } catch (err) {
-    logger.errorLog.error("task delete fail");
+    logger.errorLog.error('task delete fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -919,14 +917,14 @@ exports.TaskSearch = async (req, res) => {
 
     res.send({
       statusCode: 200,
-      message: "The task has been fetched successfully",
+      message: 'The task has been fetched successfully',
       data: allTasks,
     });
   } catch (err) {
-    logger.errorLog.error("task fetch fail");
+    logger.errorLog.error('task fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the task",
+      message: 'Failed to fetch the task',
       error: err,
     });
   }
@@ -974,26 +972,26 @@ exports.updateTaskEstimatedHours = async (req, res) => {
               item.estimated_hour = estimateHour;
             }
             return item;
-          }
+          },
         );
 
       if (updateTask) {
         const getlbCost = UpdatedLabourCost?.map(
-          (i) => parseFloat(i.estimated_hour) * parseFloat(i.unitCost)
+          (i) => parseFloat(i.estimated_hour) * parseFloat(i.unitCost),
         );
         const getTotallbCost = getlbCost?.reduce(
           (partialSum, a) => partialSum + a,
-          0
+          0,
         );
         const getTotalCost = parseFloat(getTotallbCost);
 
         const getlbEst =
           TaskDetails?.billing_line_items?.labour_item?.labour_cost_items?.map(
-            (i) => parseFloat(i.estimated_hour)
+            (i) => parseFloat(i.estimated_hour),
           );
         const getTotalEstHours = getlbEst?.reduce(
           (partialSum, a) => partialSum + a,
-          0
+          0,
         );
         const getTotalHours = parseFloat(getTotalEstHours);
 
@@ -1002,7 +1000,7 @@ exports.updateTaskEstimatedHours = async (req, res) => {
           ...TaskDetails.billing_line_items, // Spread the existing billing_line_items properties
           labour_item: {
             ...TaskDetails.billing_line_items.labour_item, // Spread the labour_item properties
-            labour_cost_items: UpdatedLabourCost, // Update only labour_cost_items
+            labour_cost_items: UpdatedLabourCost,
           },
         };
 
@@ -1014,10 +1012,10 @@ exports.updateTaskEstimatedHours = async (req, res) => {
 
         if (updateTaskData) {
           await updateTaskData.save();
-          logger.accessLog.info("task update success");
+          logger.accessLog.info('task update success');
           return res.send({
             statusCode: 200,
-            message: "The task has been updated successfully",
+            message: 'The task has been updated successfully',
             task: updateTaskData,
           });
         }
@@ -1025,20 +1023,118 @@ exports.updateTaskEstimatedHours = async (req, res) => {
 
       return res.send({
         statusCode: 200,
-        message: "The task has been updated successfully",
+        message: 'The task has been updated successfully',
         task: [],
       });
     }
     return res.send({
       statusCode: 200,
-      message: "The task has been updated successfully",
+      message: 'The task has been updated successfully',
       task: [],
     });
   } catch (err) {
-    logger.errorLog.error("task update fail");
+    logger.errorLog.error('task update fail');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
+      error: err,
+    });
+  }
+};
+
+exports.duplicateTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const originalTask = await task.findById(id).lean();
+    if (!originalTask) {
+      return res.status(404).send({
+        statusCode: 404,
+        message: 'Task not found',
+      });
+    }
+
+    const newTaskData = { ...originalTask };
+    delete newTaskData._id;
+    delete newTaskData.number;
+    delete newTaskData.number_str;
+    delete newTaskData.createdAt;
+    delete newTaskData.updatedAt;
+    delete newTaskData.__v;
+    delete newTaskData.invoice_id;
+    delete newTaskData.invoice_amount;
+
+    newTaskData.is_completed = 0;
+    newTaskData.is_invoice_generated = false;
+    newTaskData.completed_task_date = null;
+
+    const duplicatedTask = await task.create(newTaskData);
+
+    await task.findByIdAndUpdate(duplicatedTask._id, {
+      $set: { number_str: duplicatedTask.number.toString().padStart(6, '0') },
+    });
+
+    logger.accessLog.info('task duplicated successfully');
+    return res.send({
+      statusCode: 200,
+      message: 'The task has been duplicated successfully',
+      task: duplicatedTask,
+    });
+  } catch (err) {
+    logger.errorLog.error('task duplicate failed', err);
+    return res.status(500).send({
+      statusCode: 500,
+      message: 'Oops something went wrong. Please contact the administrator',
+      error: err.message,
+    });
+  }
+};
+
+exports.getInvoicesByTasks = async (req, res) => {
+  try {
+    const { taskIds } = req.body;
+
+    if (!Array.isArray(taskIds) || taskIds.length === 0) {
+      return res
+        .status(400)
+        .json({ message: 'taskIds must be a non-empty array' });
+    }
+
+    const invoices = await invoice
+      .find({
+        task_ids: { $in: taskIds },
+      })
+      .select(
+        '_id number_str total_cost total_hours generated_date qb_invoice_id is_paid task_ids',
+      );
+
+    res.status(200).json({ success: true, data: invoices });
+  } catch (err) {
+    console.error('Failed to fetch invoices:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch invoices',
+      error: err,
+    });
+  }
+};
+
+exports.getInvoicesByClient = async (req, res) => {
+  try {
+    const { client_id } = req.body;
+
+    const invoices = await invoice.find({
+      client_id: client_id,
+      is_paid: 0,
+      is_deleted: false,
+    });
+
+    res.status(200).json({ success: true, data: invoices });
+  } catch (err) {
+    console.error('Failed to fetch invoices:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch invoices',
       error: err,
     });
   }

@@ -77,7 +77,6 @@ route.get('/testApi', testApi);
 
 //masters
 route.use('/city', verifyAccessToken, cityRoute);
-route.use('/comment', verifyAccessToken, commentRoute);
 route.use('/state', verifyAccessToken, stateRoute);
 route.use('/tax', verifyAccessToken, taxRoute);
 route.use('/fee', verifyAccessToken, feeRoute);
@@ -100,10 +99,10 @@ route.use('/task', verifyAccessToken, taskRoute);
 route.use('/ratesheet', verifyAccessToken, ratesheetRoute);
 route.use('/dwr', verifyAccessToken, dwrRoute);
 route.use('/dwrreports', verifyAccessToken, dwrReportsRoute);
+route.use('/invoice', invoiceRoute);
 route.use('/schedule', verifyAccessToken, scheduleRoute);
 route.use('/holiday', verifyAccessToken, holidayRoute);
 route.use('/employee-leave', verifyAccessToken, employeeLeaveRoute);
-route.use('/invoice', invoiceRoute);
 
 // Identifier counters
 

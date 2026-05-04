@@ -1,10 +1,10 @@
-const { default: axios } = require("axios");
-const { default: mongoose } = require("mongoose");
-const logger = require("../middleware/logger");
-const { JOB_PIPELINE } = require("../middleware/pipelines");
-const job = require("../models/job");
-const quote = require("../models/quote");
-const task = require("../models/task");
+const { default: axios } = require('axios');
+const { default: mongoose } = require('mongoose');
+const logger = require('../middleware/logger');
+const { JOB_PIPELINE } = require('../middleware/pipelines');
+const job = require('../models/job');
+const quote = require('../models/quote');
+const task = require('../models/task');
 
 exports.readJobById = async (req, res) => {
   try {
@@ -19,17 +19,17 @@ exports.readJobById = async (req, res) => {
       { $sort: { createdAt: -1 } },
       ...JOB_PIPELINE,
     ]);
-    logger.accessLog.info("job fetch success");
+    logger.accessLog.info('job fetch success');
     res.send({
       statusCode: 200,
-      message: "The job has been fetched successfully",
+      message: 'The job has been fetched successfully',
       data: jobData,
     });
   } catch (err) {
-    logger.errorLog.error("job fetch fail");
+    logger.errorLog.error('job fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the job",
+      message: 'Failed to fetch the job',
       error: err,
     });
   }
@@ -41,8 +41,8 @@ exports.JobSearch = async (req, res) => {
     var myMatch = {
       is_deleted: false,
     };
-    var allTasks = []
-    if (search && search !== "00") {
+    var allTasks = [];
+    if (search && search !== '00') {
       allTasks = await job.aggregate([
         {
           $match: {
@@ -58,24 +58,24 @@ exports.JobSearch = async (req, res) => {
         },
         ...JOB_PIPELINE,
         {
-          $sort: { _id: -1 }, // Sort by `_id` in descending order
+          $sort: { _id: -1 },
         },
         {
-          $limit: 100, // Limit to the last 200 records
+          $limit: 100,
         },
-      ])
+      ]);
     }
 
     res.send({
       statusCode: 200,
-      message: "The job has been fetched successfully",
+      message: 'The job has been fetched successfully',
       data: allTasks,
     });
   } catch (err) {
-    logger.errorLog.error("job fetch fail");
+    logger.errorLog.error('job fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the job",
+      message: 'Failed to fetch the job',
       error: err,
     });
   }
@@ -86,15 +86,15 @@ exports.readJob = async (req, res) => {
     var page = req.query.page;
     var per_page = req.query.per_page;
     var search = req.query.search;
-    var sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    var sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     if (page === undefined) {
-      page = "1";
+      page = '1';
     }
     if (per_page === undefined) {
       per_page = process.env.PAGINATION;
     }
     const data = page * per_page - per_page;
-    if (search === "") {
+    if (search === '') {
       var totalDataCount = await job.countDocuments({ is_deleted: false });
       var allJobs = await job.aggregate([
         { $match: { is_deleted: false } },
@@ -109,14 +109,14 @@ exports.readJob = async (req, res) => {
           { is_deleted: false },
           {
             $or: [
-              { number_str: { $regex: search, $options: "i" } }, // Case-insensitive search for number_str
-              { "locations.name": { $regex: search, $options: "i" } }, // Search in locations.name
+              { number_str: { $regex: search, $options: 'i' } }, // Case-insensitive search for number_str
+              { 'locations.name': { $regex: search, $options: 'i' } }, // Search in locations.name
               {
-                "locations.munciple_address": { $regex: search, $options: "i" },
+                'locations.munciple_address': { $regex: search, $options: 'i' },
               }, // Search in locations.munciple_address
-              { "locations.state": { $regex: search, $options: "i" } }, // Search in locations.state
-              { "locations.postal_code": { $regex: search, $options: "i" } }, // Search in locations.postal_code
-              { "locations.city": { $regex: search, $options: "i" } }, // Sea
+              { 'locations.state': { $regex: search, $options: 'i' } }, // Search in locations.state
+              { 'locations.postal_code': { $regex: search, $options: 'i' } }, // Search in locations.postal_code
+              { 'locations.city': { $regex: search, $options: 'i' } }, // Sea
             ],
           },
         ],
@@ -128,19 +128,19 @@ exports.readJob = async (req, res) => {
               { is_deleted: false },
               {
                 $or: [
-                  { number_str: { $regex: search, $options: "i" } }, // Case-insensitive search for number_str
-                  { "locations.name": { $regex: search, $options: "i" } }, // Search in locations.name
+                  { number_str: { $regex: search, $options: 'i' } },
+                  { 'locations.name': { $regex: search, $options: 'i' } },
                   {
-                    "locations.munciple_address": {
+                    'locations.munciple_address': {
                       $regex: search,
-                      $options: "i",
+                      $options: 'i',
                     },
-                  }, // Search in locations.munciple_address
-                  { "locations.state": { $regex: search, $options: "i" } }, // Search in locations.state
+                  },
+                  { 'locations.state': { $regex: search, $options: 'i' } },
                   {
-                    "locations.postal_code": { $regex: search, $options: "i" },
-                  }, // Search in locations.postal_code
-                  { "locations.city": { $regex: search, $options: "i" } }, // Sea
+                    'locations.postal_code': { $regex: search, $options: 'i' },
+                  },
+                  { 'locations.city': { $regex: search, $options: 'i' } },
                 ],
               },
             ],
@@ -152,18 +152,18 @@ exports.readJob = async (req, res) => {
         ...JOB_PIPELINE,
       ]);
     }
-    logger.accessLog.info("job fetch success");
+    logger.accessLog.info('job fetch success');
     res.send({
       statusCode: 200,
-      message: "The job has been fetched successfully",
+      message: 'The job has been fetched successfully',
       total: totalDataCount,
       data: allJobs,
     });
   } catch (err) {
-    logger.errorLog.error("job fetch fail");
+    logger.errorLog.error('job fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the job",
+      message: 'Failed to fetch the job',
       error: err,
     });
   }
@@ -176,13 +176,13 @@ exports.managerReadJob = async (req, res) => {
     var per_page = req.query.per_page;
     var search = req.query.search;
     if (page === undefined) {
-      page = "1";
+      page = '1';
     }
     if (per_page === undefined) {
       per_page = process.env.PAGINATION;
     }
     const data = page * per_page - per_page;
-    if (search === "") {
+    if (search === '') {
       var totalDataCount = await job.countDocuments({ is_deleted: false });
       var allJobs = await job.aggregate([
         { $match: { is_deleted: false } },
@@ -212,18 +212,18 @@ exports.managerReadJob = async (req, res) => {
       ]);
     }
 
-    logger.accessLog.info("job fetch success");
+    logger.accessLog.info('job fetch success');
     res.send({
       statusCode: 200,
-      message: "manager job data fetch successfully",
+      message: 'manager job data fetch successfully',
       total: totalDataCount,
       data: allJobs,
     });
   } catch (err) {
-    logger.errorLog.error("job fetch fail");
+    logger.errorLog.error('job fetch fail');
     res.send({
       statusCode: 500,
-      message: "manager job data fetch fail",
+      message: 'manager job data fetch fail',
       error: err,
     });
   }
@@ -238,17 +238,17 @@ exports.readAllJob = async (req, res) => {
       { $sort: { createdAt: -1 } },
       ...JOB_PIPELINE,
     ]);
-    logger.accessLog.info("job fetch success");
+    logger.accessLog.info('job fetch success');
     res.send({
       statusCode: 200,
-      message: "The job has been fetched successfully",
+      message: 'The job has been fetched successfully',
       data: userData,
     });
   } catch (err) {
-    logger.errorLog.error("job fetch fail");
+    logger.errorLog.error('job fetch fail');
     res.send({
       statusCode: 500,
-      message: "Failed to fetch the job",
+      message: 'Failed to fetch the job',
       error: err,
     });
   }
@@ -304,19 +304,21 @@ exports.createJob = async (req, res) => {
     });
     if (newJob) {
       await newJob.save();
-      await job.findByIdAndUpdate(newJob._id, { $set: { number_str: newJob.number.toString().padStart(6, '0') } })
-      logger.accessLog.info("The job has been created successfully");
+      await job.findByIdAndUpdate(newJob._id, {
+        $set: { number_str: newJob.number.toString().padStart(6, '0') },
+      });
+      logger.accessLog.info('The job has been created successfully');
       res.send({
         statusCode: 200,
-        message: "The job has been created successfully",
+        message: 'The job has been created successfully',
         job: newJob,
       });
     }
   } catch (err) {
-    logger.errorLog.error("Failed to create the job");
+    logger.errorLog.error('Failed to create the job');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -377,18 +379,18 @@ exports.updateJob = async (req, res) => {
     });
     if (updateJobData) {
       await updateJobData.save();
-      logger.accessLog.info("The job has been updated successfully.");
+      logger.accessLog.info('The job has been updated successfully.');
       res.send({
         statusCode: 200,
-        message: "The job has been updated successfully",
+        message: 'The job has been updated successfully',
         job: updateJobData,
       });
     }
   } catch (err) {
-    logger.errorLog.error("Failed to update the job.");
+    logger.errorLog.error('Failed to update the job.');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
@@ -405,7 +407,7 @@ exports.deleteJob = async (req, res) => {
       return res.send({
         statusCode: 400,
         message:
-          "delete is not possible. The job is referenced in the Quote collection",
+          'delete is not possible. The job is referenced in the Quote collection',
       });
     }
     const jobDetails = await job.findOne({
@@ -421,24 +423,24 @@ exports.deleteJob = async (req, res) => {
       return res.send({
         statusCode: 400,
         message:
-          "delete is not possible. The job is referenced in the Task collection",
+          'delete is not possible. The job is referenced in the Task collection',
       });
     }
 
     const deleteJobData = await job.findByIdAndUpdate(id, {
       $set: { is_deleted: true },
     });
-    logger.accessLog.info("Job deleted successfully.");
+    logger.accessLog.info('Job deleted successfully.');
     res.send({
       statusCode: 200,
-      message: "Job deleted successfully",
+      message: 'Job deleted successfully',
       job: deleteJobData,
     });
   } catch (err) {
-    logger.errorLog.error("Failed to delete the job.");
+    logger.errorLog.error('Failed to delete the job.');
     res.send({
       statusCode: 500,
-      message: "Oops Something went wrong. Please contact the administrator",
+      message: 'Oops Something went wrong. Please contact the administrator',
       error: err,
     });
   }
