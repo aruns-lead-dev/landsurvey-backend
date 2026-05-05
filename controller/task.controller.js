@@ -1,4 +1,4 @@
-const { mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 const logger = require('../middleware/logger');
 const Jimp = require('jimp');
 const {
@@ -456,7 +456,7 @@ exports.readAllTask = async (req, res) => {
 };
 
 exports.createTask = async (req, res) => {
-  const session = await mongooseLib.startSession();
+  const session = await mongoose.startSession();
   session.startTransaction();
   try {
     const {
@@ -602,6 +602,10 @@ exports.createTask = async (req, res) => {
         message: 'The task has been created successfully',
         task: newTask,
       });
+    } else {
+      await session.abortTransaction();
+      session.endSession();
+      res.send({ statusCode: 500, message: 'Task creation failed' });
     }
   } catch (err) {
     await session.abortTransaction();
@@ -726,7 +730,7 @@ exports.updateTask = async (req, res) => {
         .filter((c) => c && validCostItems.includes(c));
 
       const existingSchedulings = await scheduling.find({
-        task_id: mongooseLib.Types.ObjectId(id),
+        task_id: mongoose.Types.ObjectId(id),
         is_deleted: false,
       });
 
@@ -876,7 +880,7 @@ exports.deleteTask = async (req, res) => {
     });
 
     await scheduling.updateMany(
-      { task_id: mongooseLib.Types.ObjectId(id), is_deleted: false },
+      { task_id: mongoose.Types.ObjectId(id), is_deleted: false },
       { $set: { is_deleted: true } },
     );
 

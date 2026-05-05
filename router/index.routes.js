@@ -100,6 +100,7 @@ route.use('/ratesheet', verifyAccessToken, ratesheetRoute);
 route.use('/dwr', verifyAccessToken, dwrRoute);
 route.use('/dwrreports', verifyAccessToken, dwrReportsRoute);
 route.use('/invoice', invoiceRoute);
+route.use('/comment', verifyAccessToken, commentRoute);
 route.use('/schedule', verifyAccessToken, scheduleRoute);
 route.use('/holiday', verifyAccessToken, holidayRoute);
 route.use('/employee-leave', verifyAccessToken, employeeLeaveRoute);
